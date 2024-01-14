@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Newtonsoft.Json;
 using NuGet.Protocol.Plugins;
-using PagedList.Core;
 using System.Text;
 
 namespace front.Controllers
