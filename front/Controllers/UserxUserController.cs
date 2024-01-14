@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Newtonsoft.Json;
 using NuGet.Protocol.Plugins;
+using PagedList.Core;
 using System.Text;
 
 namespace front.Controllers
@@ -40,12 +41,12 @@ namespace front.Controllers
 
         [Authorize(Roles = UserRoles.Admin)]
         [HttpGet("UserxUser")]
-        public IActionResult Index(int page = 1, int pageSize = 10)
+        public IActionResult Index(int page = 1, int pageSize = 5)
         {
             List<UserXUserViewModel> userList = ObterListaUserXUser(page, pageSize);
 
             if (userList != null)
-            {               
+            {                
                 return View(userList);
             }
             else
@@ -76,12 +77,12 @@ namespace front.Controllers
                 {
                     ModelState.AddModelError(string.Empty, "Erro inesperado ou sem permição");
                 }
-                return View("Index", new List<UserXUserViewModel>(ObterListaUserXUser(1, 10)));
+                return View("Index", new List<UserXUserViewModel>(ObterListaUserXUser(1, 5)));
             }           
 
             TempData["Sucesso"] = "Usuario adicionado com sucesso.";
 
-            return View("Index", new List<UserXUserViewModel>(ObterListaUserXUser(1, 10)));
+            return View("Index", new List<UserXUserViewModel>(ObterListaUserXUser(1, 5)));
         }
 
         [HttpGet]
