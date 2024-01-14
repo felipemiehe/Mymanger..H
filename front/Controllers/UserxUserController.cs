@@ -85,9 +85,9 @@ namespace front.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetUserList(int page = 1, int pageSize = 10)
+        public IActionResult GetUserList(int page = 1, int pageSize = 5)
         {
-            var userList = ObterListaUserXUser(page, pageSize);
+            var userList = ObterListaUserXUser(page, pageSize);            
             return PartialView("_UserxUserPartial", userList);
         }                
      
@@ -142,6 +142,21 @@ namespace front.Controllers
             }
 
             return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_AtualizaOutroUserPartial", model) });
+        }
+
+        [HttpPost("deletauserxuser")]
+        public async Task<IActionResult> deletauserxuser(string email)
+        {
+            HttpClient configuredClient = new ClienteComCookie(Request).ConfiguredClient;
+            HttpResponseMessage response = await configuredClient.DeleteAsync(configuredClient.BaseAddress + $"api/auth/deletaruserxuser/{email}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return Json(new { success = true, message = "Usuario excluido com sucesso!"});
+
+            }
+            return Json(new { success = false, message = "erro ao excluir!" });
+
         }
 
 
