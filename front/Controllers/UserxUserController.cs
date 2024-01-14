@@ -15,29 +15,34 @@ namespace front.Controllers
 {
     public class UserxUserController: Controller
     {
-      
-               
-        private List<UserXUserViewModel> ObterListaUserXUser()
+
+
+        private List<UserXUserViewModel> ObterListaUserXUser(int page, int pageSize)
         {
             HttpClient configuredClient = new ClienteComCookie(Request).ConfiguredClient;
-            HttpResponseMessage response = configuredClient.GetAsync(configuredClient.BaseAddress + "api/auth/pegaruserxuser").Result;
+            HttpResponseMessage response = configuredClient.GetAsync(configuredClient.BaseAddress + $"api/auth/pegaruserxuser?page={page}&pageSize={pageSize}").Result;
 
             if (response.IsSuccessStatusCode)
             {
                 string content = response.Content.ReadAsStringAsync().Result;
                 List<UserXUserViewModel> userList = JsonConvert.DeserializeObject<List<UserXUserViewModel>>(content);
-                return userList;
+                if(userList != null)
+                {
+                    return userList;
+                }
+                
             }
-            
+
             return new List<UserXUserViewModel>();
         }
 
-       
+
 
         [Authorize(Roles = UserRoles.Admin)]
-        public IActionResult Index()
+        [HttpGet("UserxUser")]
+        public IActionResult Index(int page = 1, int pageSize = 10)
         {
-            List<UserXUserViewModel> userList = ObterListaUserXUser();
+            List<UserXUserViewModel> userList = ObterListaUserXUser(page, pageSize);
 
             if (userList != null)
             {               
@@ -49,8 +54,8 @@ namespace front.Controllers
             }
         }
 
-        [HttpPost]
-        public IActionResult Index(RegisterUserViewModel model)
+        [HttpPost("RegisterUser")]
+        public IActionResult RegisterUser(RegisterUserViewModel model)
         {
             string data = JsonConvert.SerializeObject(model);
             StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
@@ -62,8 +67,7 @@ namespace front.Controllers
             {
 
                 string Json = response.Content.ReadAsStringAsync().Result;
-                var responseObject = JsonConvert.DeserializeObject<ResponseDTO>(Json);
-                List<UserXUserViewModel> userList = ObterListaUserXUser();
+                var responseObject = JsonConvert.DeserializeObject<ResponseDTO>(Json);                
                 if (responseObject != null && responseObject.Message != null)
                 {
                     ModelState.AddModelError(string.Empty, responseObject.Message);
@@ -71,27 +75,22 @@ namespace front.Controllers
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Erro inesperado ou sem permição");
-                }               
-                return View(new List<UserXUserViewModel>(userList));
+                }
+                return View("Index", new List<UserXUserViewModel>(ObterListaUserXUser(1, 10)));
             }           
 
             TempData["Sucesso"] = "Usuario adicionado com sucesso.";
-            return View(new List<UserXUserViewModel>(ObterListaUserXUser()));
+
+            return View("Index", new List<UserXUserViewModel>(ObterListaUserXUser(1, 10)));
         }
 
         [HttpGet]
-        public IActionResult GetUserList()
+        public IActionResult GetUserList(int page = 1, int pageSize = 10)
         {
-            var userList = ObterListaUserXUser();
+            var userList = ObterListaUserXUser(page, pageSize);
             return PartialView("_UserxUserPartial", userList);
-        }
-
-        [HttpGet]
-        public IActionResult atualizaoutrouser()
-        {
-           
-            return PartialView("_AtualizaOutroUserPartial", new AtualizaOutroUserModel());
-        }
+        }                
+     
 
 
         [HttpGet]

@@ -184,45 +184,62 @@ namespace Auth.Controllers
         [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> Register([FromBody] RegisterDTO dto)
         {
-            
-            var emailExists = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
-            var CodigoUnico = await _userManager.Users.FirstOrDefaultAsync(k => k.CodigoUnico == dto.CodigoUnico);
-            var Cpf = await _userManager.Users.FirstOrDefaultAsync(l => l.Cpf == dto.Cpf);
-            if (emailExists != null || CodigoUnico != null || Cpf != null)
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseDTO { Status = "Error", Message = "Usuario já existe ou CPF e CodigoUnico ja cadastrados" });
-
-            ApplicationUser user = new()
+          
+            try
             {
-                Email = dto.Email,
-                SecurityStamp = Guid.NewGuid().ToString(),               
-                Name = dto.Name,
-                PhoneNumber = dto.PhoneNumber,
-                Cpf = dto.Cpf,
-                CodigoUnico = dto.CodigoUnico,
-                UserName = Guid.NewGuid().ToString(),
-            };
-            var result = await _userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded)
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseDTO { Status = "Error", Message = "User creation failed! Please check user details and try again." });
-            
-            if (!await _roleManager.RoleExistsAsync(UserRoles.User))
-                await _roleManager.CreateAsync(new ApplicationRoles(UserRoles.User));
+                ApplicationUser user = new()
+                {
+                    Email = dto.Email,
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    Name = dto.Name,
+                    PhoneNumber = dto.PhoneNumber,
+                    Cpf = dto.Cpf,
+                    CodigoUnico = dto.CodigoUnico,
+                    UserName = Guid.NewGuid().ToString(),
+                };
+                var result = await _userManager.CreateAsync(user, dto.Password);
+                if (!result.Succeeded)
+                {
+                    var errors = result.Errors.Select(e => e.Description).ToList();
+                    var errorMessage = string.Join(", ", errors);
 
-            if (await _roleManager.RoleExistsAsync(UserRoles.User))
-            {
-                await _userManager.AddToRoleAsync(user, UserRoles.User);
+                    return BadRequest(new ResponseDTO { Status = "Error", Message = $"{errorMessage}" });
+                }
+                if (!await _roleManager.RoleExistsAsync(UserRoles.User))
+                    await _roleManager.CreateAsync(new ApplicationRoles(UserRoles.User));
+
+                if (await _roleManager.RoleExistsAsync(UserRoles.User))
+                {
+                    await _userManager.AddToRoleAsync(user, UserRoles.User);
+                }
+
+                UserxUser uxu = new()
+                {
+                    User_Admin_Id = User.FindFirstValue("userId"),
+                    User_Agregado_Id = user.Id,
+                };
+
+                _context.UserxUsers.Add(uxu);
+                await _context.SaveChangesAsync();
+
+                return Ok(new ResponseDTO { Status = "Success", Message = "User created successfully!" });
             }
-
-            UserxUser uxu = new()
+            catch (Exception ex)
             {
-                User_Admin_Id = User.FindFirstValue("userId"),
-                User_Agregado_Id = user.Id,
-            };
+                if (ex.InnerException is SqlException sqlException && sqlException.Number == 2601)
+                {
+                    // Número 2601 é a exceção específica para violação de restrição única no SQL Server
+                    var errorMessage = sqlException.Message;
 
-            _context.UserxUsers.Add(uxu);
-            await _context.SaveChangesAsync();
+                    // Extrai o valor duplicado da mensagem de erro
+                    var startIndex = errorMessage.IndexOf("(") + 1;
+                    var endIndex = errorMessage.IndexOf(")");
+                    var valorDuplicado = errorMessage.Substring(startIndex, endIndex - startIndex);
 
-            return Ok(new ResponseDTO { Status = "Success", Message = "User created successfully!" });
+                    return BadRequest(new ResponseDTO { Status = "Error", Message = $"O valor '{valorDuplicado}' já está em uso." });
+                }
+                throw;
+            }
         }
 
        // [Authorize(Roles = UserRoles.Admin)]
@@ -479,15 +496,21 @@ namespace Auth.Controllers
         [HttpGet]        
         [Authorize(Roles = UserRoles.Admin)]
         [Route("pegaruserxuser")]
-
-        public async Task<IActionResult> pegarUserxUser()
+        public async Task<IActionResult> PegarUserxUser([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             try
             {
                 var userAdminId = User.FindFirstValue("userId");
 
+                var totalRecords = await _context.UserxUsers
+                   .Where(x => x.User_Admin_Id == userAdminId)
+                   .CountAsync();
+
                 var userxusers = await _context.UserxUsers
                     .Where(x => x.User_Admin_Id == userAdminId)
+                    .OrderByDescending(x => x.Data_criacao)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .ToListAsync();
 
                 var userXUserList = new List<UserXUserResponseDTO>();
@@ -508,7 +531,9 @@ namespace Auth.Controllers
                             user.PhoneNumber,
                             user.Cpf,
                             user.CodigoUnico,
-                            roles.ToList()
+                            roles.ToList(),
+                            totalRecords,
+                            (int)Math.Ceiling((double)totalRecords / pageSize)
                         );
 
                         userXUserList.Add(userXUserDTO);
@@ -519,9 +544,8 @@ namespace Auth.Controllers
             }
             catch (Exception)
             {
-
                 _logger.LogWarning("Erro ao pegarUserxUser");
-                return NotFound(new ResponseDTO { Status = "Error", Message = "Não foi pegarUserxUser" });
+                return NotFound(new ResponseDTO { Status = "Error", Message = "Não foi possível obter os dados de UserxUser." });
             }
         }
 
@@ -688,7 +712,6 @@ namespace Auth.Controllers
             }
 
         }
-
 
     }
 }

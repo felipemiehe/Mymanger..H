@@ -20,6 +20,7 @@ namespace Auth.Entities
         [Required]
         public string? User_Agregado_Id { get; set; }
 
+        public DateTime Data_criacao { get; set; } = DateTime.Now;
         public string? User_Admin_agregado { get; set; }
         
 

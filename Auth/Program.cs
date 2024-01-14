@@ -24,18 +24,18 @@ builder.Services.AddLogging();
 builder.Services.AddIdentity<ApplicationUser, ApplicationRoles>(options =>
 {
     // Configurações de senha
-    options.Password.RequireDigit = true;
+    options.Password.RequireDigit = false;
     options.Password.RequiredLength = 8;
-    options.Password.RequireLowercase = true;
+    options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15); // Tempo de bloqueio padrão
     options.Lockout.MaxFailedAccessAttempts = 5; // Número máximo de tentativas de login malsucedidas
-    options.Lockout.AllowedForNewUsers = true; // Bloquear novos usuários após tentativas malsucedidas
+    options.Lockout.AllowedForNewUsers = true; // Bloquear novos usuários após tentativas malsucedidas       
 
 })
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders();    
 
 // Adding Authentication
 builder.Services.AddAuthentication(options =>

@@ -2,7 +2,7 @@
 {
     public class UserXUserResponseDTO
     {
-        public UserXUserResponseDTO(int id, string userId, string email, string nome, string numero, string cpf, string codigoUnico, List<string> roles)
+        public UserXUserResponseDTO(int id, string userId, string email, string nome, string numero, string cpf, string codigoUnico, List<string> roles, int totalAchados, int totalPages)
         {
             Id = id;
             UserId = userId ?? throw new ArgumentNullException(nameof(userId));
@@ -12,6 +12,8 @@
             Cpf = cpf ?? throw new ArgumentNullException(nameof(cpf));
             CodigoUnico = codigoUnico ?? throw new ArgumentNullException(nameof(codigoUnico));
             Roles = roles ?? throw new ArgumentNullException(nameof(roles));
+            TotalAchados = totalAchados;
+            TotalPages = totalPages;
         }
 
         public int Id { get; set; }
@@ -22,5 +24,7 @@
         public string Cpf { get; set; }
         public string CodigoUnico { get; set; }
         public List<string> Roles { get; set; }
+        public int TotalAchados { get; set; }
+        public int TotalPages { get; set; }
     }
 }

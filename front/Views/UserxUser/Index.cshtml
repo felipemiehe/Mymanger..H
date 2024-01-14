@@ -17,7 +17,17 @@
 
 <div class="card-body pt-4 p-3 mb-3">
     <div class="p-3 shadow">
-        <div class="row">            
+        <div class="row">
+
+            @if (Model != null && Model.Any())
+            {
+                <div>
+                    @for (var i = 1; i <= Model.First().TotalPages; i++)
+                    {
+                        <a href="@Url.Action("Index", new { page = i  })">@i</a>
+                    }
+                </div>
+            }
 
             <div class="col-md-6">
             <!-- Coluna da Lista de Usuários -->

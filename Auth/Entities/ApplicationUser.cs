@@ -18,6 +18,8 @@ namespace Auth.Entities
 
         public bool IsActive { get; set; } = true;
 
+        public DateTime Data_criacao { get; set; } = DateTime.Now;
+
         public ICollection<UserAdminRolescontrol> UserAdminRolescontrols { get; set; }        
 
 
