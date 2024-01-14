@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>    
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />    
+    <link rel="stylesheet" href="~/front.styles.css" asp-append-version="true" /> 
+
+    <!-- Bootstrap Font Icon CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">   
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+
+
+
+</head>
+<body>
+
+    @{
+        ViewData["Title"] = "Login";
+        var errorModel = new ErrorModalModel
+            {
+                ErrorMessage = "Esta é uma mensagem de erro dinâmica."
+            };
+    }
+
+    <partial name="_ErrorModal" model="errorModel" />   
+
+    <div class="hero_area">
+        <header class="header_section">
+            <div class="header_top">
+                <div class="container-fluid">
+                    <div class="contact_nav">
+
+                        @if (User?.Identity?.IsAuthenticated == true)
+                        {
+                            <a class="dropdown-toggle" id="offcanvasNavbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none; color: #ffffff;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#ffffff'">
+                                    @(User.Identity.Name)
+                            </a>
+                                <ul class="dropdown-menu" aria-labelledby="offcanvasNavbarDropdown">
+                                    <li><a class="dropdown-item" href="#" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Action</a></li>
+                                    <li><a class="dropdown-item" href="#" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Another action</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'" onclick="logout()">Sair</a></li>
+
+                                </ul>
+
+                            @Html.Partial("~/Views/Shared/_SideBar.cshtml")
+                        }                        
+
+                        @if (User?.Identity?.IsAuthenticated != true)
+                        {
+                            <a href="/Login" style="text-decoration: none; color: white;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#FFFFFF'">Login</a>
+                        }
+
+                    </div>
+                </div>
+            </div>            
+        </header>
+    </div>
+    <div>
+        <main >
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer text-muted">
+        <div class="footer-meu">
+            &copy; 2023 - All Rights Reserved by MymanagerH - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script>
+        function logout() {
+            $.ajax({
+                url: '/Login/Logout',
+                type: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cookie': document.cookie
+                },
+                success: function (result) {
+                    if (result.success === false) {
+                        showErrorModal(result.errorMessage);
+                        window.location.href = result.redirectUrl;
+                    } else {
+                        if (result.redirectUrl) {   
+                            window.location.href = result.redirectUrl;
+                        }
+                    }
+                },
+                error: function (error) {
+                    showErrorModal('Erro ao processar a requisição.');                    
+                },               
+            });
+        }
+
+
+
+    </script>   
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <!-- Adicione a referência ao jQuery aqui -->    
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    
+   
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

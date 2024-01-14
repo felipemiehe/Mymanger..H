@@ -1,0 +1,107 @@
+﻿@model front.Models.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+    var errorModel = new ErrorModalModel
+            {
+                ErrorMessage = "Esta é uma mensagem de erro dinâmica."
+            };
+}
+<style>
+    body {        
+        background-color: #d1e3ff;
+        
+    }
+
+</style>
+
+<partial name="_LoadingModal" />
+<partial name="_ErrorModal" model="errorModel" />
+
+
+<div class="container d-flex justify-content-center align-items-center " style="padding-top: 10px; padding-bottom: 30px;">
+
+    <img src="~/images/professional-img.png" alt="" class="img-responsive d-none d-md-inline" style="max-width: 100%; height: auto; width: 40%;">
+    
+    <div class="card" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+        <div class="card-body">
+            <h2 class="card-title">Login</h2>
+            <form  method="post" class="form" id="loginForm" style="padding: 30px">
+                <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Email"></label>
+                    <input asp-for="Email" class="form-control" style="width: 300px;" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Password"></label>
+                    <input asp-for="Password" type="password" class="form-control" style="width: 300px;" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div> 
+                
+                <button type="submit" class="btn btn-primary" id="submitButton">
+                        <span id="loadingIndicator" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        Entrar
+                </button>
+                
+            </form>
+            <a href="/Login/ForgotPassword" style="color: black; font-size: smaller;">Esqueceu sua senha?</a>
+
+        </div>
+    </div>
+    
+
+</div>
+
+@section Scripts {        
+    
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            $('#loginForm').submit(function (event) {
+                event.preventDefault();
+
+                if (!$(this).valid()) {
+                    return;
+                }
+
+                showLoadingModal();
+
+                var formData = $(this).serialize();
+
+                $.ajax({
+                    url: '/Login',
+                    type: 'POST',
+                    data: formData,
+                    success: function (result) {
+                        if (result.success === false) {
+                            showErrorModal(result.errorMessage);
+                        } else {
+                            if (result.redirectUrl) {
+                                window.location.href = result.redirectUrl;
+                            }
+                        }
+                    },
+                    error: function (error) {
+                        showErrorModal('Erro ao processar a requisição.');
+                    },
+                    complete: function () {
+                        setTimeout(function () {
+                            hideLoadingModal();
+                        }, 500);
+
+                        $('#loginForm')[0].reset();
+                    }
+                });
+            });
+            
+            $('#errorModal').on('hidden.bs.modal', function () {
+                $('#errorMessage').empty();
+            });
+        });
+    </script>
+}

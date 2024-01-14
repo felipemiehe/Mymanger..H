@@ -1,0 +1,90 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Merriweather+Sans:wght@400;700&display=swap");
+
+
+body {
+    font-family: 'Lato', sans-serif;
+    color: #040000;
+}
+
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+
+.navbar-toggler:hover {
+    background-color: #ccc;
+}
+
+.navbar-toggler, .navbar-toggler svg {
+    transition: all 0.3s ease-in-out;
+}
+
+    .navbar-toggler:hover {
+        transform: scale(1.2);
+    }
+
+        .navbar-toggler:hover svg {
+            transform: scale(1.2);
+        }
+
+
+.navbar-nav .nav-item-sidebar {
+    display: inline-block;
+    transition: transform 0.3s ease-in-out;
+    box-sizing: border-box;
+    text-align: center;
+    overflow-x: hidden;
+}
+
+    .navbar-nav .nav-item-sidebar:hover {
+        transform: scale(1.2);
+        transform-origin: center center;
+    }
+
+.offcanvas-body {
+    overflow-x: hidden;
+}
+
+.accordion-icon {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    vertical-align: middle;
+    border-top: 5px solid;
+    border-right: 5px solid transparent;
+    border-left: 5px solid transparent;
+    margin-left: 10px;
+    transition: transform 0.3s;
+}
+
+.accordion-button-text {
+    cursor: pointer;
+    text-decoration: none;
+    color: #000;
+}
+
+    .accordion-button-text:hover {
+        color: #007bff;
+    }
+
+    .accordion-button-text.collapsed .accordion-icon {
+        transform: rotate(0deg);
+    }
+
+    .accordion-button-text:not(.collapsed) .accordion-icon {
+        transform: rotate(180deg);
+    }
+
+
+

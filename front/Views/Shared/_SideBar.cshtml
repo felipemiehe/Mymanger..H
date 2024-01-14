@@ -1,0 +1,69 @@
+﻿
+
+<button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list text-white" viewBox="0 0 16 16">
+        <path d="M0 0h16v1H0zm0 7h16V6H0v1zm0 7h16v-1H0z" />
+    </svg>
+</button>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3" style="list-style-type: none;">            
+            
+            <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
+                <a class="nav-link active" aria-current="page" href="#" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'" onclick="logout()">Logout</a>
+            </li>    
+            
+            <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
+                <a class="nav-link active" aria-current="page" href="#" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Home</a>
+            </li>
+            <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
+                <a class="nav-link" href="#" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Link</a>
+            </li>
+            @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+            {
+                <!-- Mostrar o item apenas se o usuário tiver a função "Admin" -->
+                <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
+                    <a class="nav-link" href="#" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Item para Admin</a>
+                </li>
+            }
+
+
+            <!-- Acordion com varios items dentro colapse -->
+            <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;" data-bs-toggle="collapse" data-bs-target="#components-collapse" aria-expanded="true" aria-current="true">
+                <div class="accordion-button-text nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#components-collapse" aria-expanded="true" aria-controls="flush-collapseOne">
+                    Accordion Item #1
+                    <span class="accordion-icon"></span>
+                </div>
+            </li>
+
+            <li>
+                <div class="collapse show" id="components-collapse">
+                    <ul class="navbar-nav justify-content-end flex-grow-1 pe-3" style="list-style-type: none;">
+                        <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
+                            <a class="nav-link active" aria-current="page" href="#" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Home</a>
+                        </li>
+
+                        <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
+                            <a class="nav-link active" aria-current="page" href="#" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Ativos</a>
+                        </li>
+                        
+                    </ul>
+                </div>
+            </li>
+            <!-- fim -->
+
+            <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
+                <a class="nav-link" href="#" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Link</a>
+            </li>
+                          
+         
+
+        </ul>        
+    </div>
+</div>
