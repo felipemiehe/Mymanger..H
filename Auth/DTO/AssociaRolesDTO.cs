@@ -4,10 +4,10 @@ namespace Auth.DTO
 {
     public class AssociaRolesDTO
     {
-        [Required(ErrorMessage = "Role nome é obrigatorio")]
+        [Required(ErrorMessage = "Função é obrigatorio")]
         public string RoleName { get; set; }
-        [Required(ErrorMessage = "User id é obrigatorio")]
-        public string UserId { get; set; }
+        [Required(ErrorMessage = "Codigo Unico é obrigatorio")]
+        public string CodigoUnico { get; set; }
         
 
     }

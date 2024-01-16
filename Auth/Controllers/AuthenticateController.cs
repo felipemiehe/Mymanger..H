@@ -560,8 +560,9 @@ namespace Auth.Controllers
         {
             try
             {
-                var role = await _roleManager.FindByNameAsync(dto.RoleName);
-                var user = await _context.Users.FindAsync(dto.UserId);
+                var role = await _roleManager.FindByNameAsync(dto.RoleName);               
+                var user = await _context.Users
+                   .FirstOrDefaultAsync(u => u.CodigoUnico == dto.CodigoUnico);
                 var userAdminId = User.FindFirstValue("userId");
                               
 
@@ -587,11 +588,11 @@ namespace Auth.Controllers
                     }
                     else
                     {
-                        return BadRequest(new ResponseDTO { Status = "Info", Message = "O usuario ja tem essa role associada ou voce nao tem permissao" });
+                        return BadRequest(new ResponseDTO { Status = "Error", Message = "O usuario ja tem essa role associada ou voce nao tem permissao" });
                     }
                 }
 
-                return NotFound(new ResponseDTO { Status = "Error", Message = "Role ou usuário não encontrado." });
+                return NotFound(new ResponseDTO { Status = "Error", Message = "Função ou Codigo unico não encontrado." });
             }
             catch (Exception)
             {
@@ -606,28 +607,37 @@ namespace Auth.Controllers
         [Route("desssacociarroles")]
         public async Task<IActionResult> desssacociarRoles([FromBody] AssociaRolesDTO dto)
         {
-            var role = await _roleManager.FindByNameAsync(dto.RoleName);
-            var user = await _context.Users.FindAsync(dto.UserId);
-            var userAdminId = User.FindFirstValue("userId");
-                                             
-
-            if (role != null && user != null)
+            try
             {
-                var userxUserAssociation = await _context.UserxUsers
-                    .FirstOrDefaultAsync(u => u.User_Admin_Id == userAdminId && u.User_Agregado_Id == user.Id);
+                var role = await _roleManager.FindByNameAsync(dto.RoleName);
+                var user = await _context.Users
+                      .FirstOrDefaultAsync(u => u.CodigoUnico == dto.CodigoUnico);
+                var userAdminId = User.FindFirstValue("userId");
 
-                var userRole = await _context.UserRoles.FirstOrDefaultAsync(ur => ur.UserId == user.Id && ur.RoleId == role.Id);
 
-                if (userRole != null && userxUserAssociation != null)
+                if (role != null && user != null)
                 {
-                    _context.UserRoles.Remove(userRole);
-                    await _context.SaveChangesAsync();
+                    var userxUserAssociation = await _context.UserxUsers
+                        .FirstOrDefaultAsync(u => u.User_Admin_Id == userAdminId && u.User_Agregado_Id == user.Id);
 
-                    return Ok(new ResponseDTO { Status = "Success", Message = "Role dissociada com sucesso." });
+                    var userRole = await _context.UserRoles.FirstOrDefaultAsync(ur => ur.UserId == user.Id && ur.RoleId == role.Id);
+
+                    if (userRole != null && userxUserAssociation != null)
+                    {
+                        _context.UserRoles.Remove(userRole);
+                        await _context.SaveChangesAsync();
+
+                        return Ok(new ResponseDTO { Status = "Success", Message = "Função removida com sucesso." });
+                    }
                 }
-            }
 
-            return NotFound(new ResponseDTO { Status = "Error", Message = "Role ou usuário não encontrado." });
+                return NotFound(new ResponseDTO { Status = "Error", Message = "Função ou usuário não encontrado." });
+            }
+            catch (Exception)
+            {
+                _logger.LogWarning("desssacociarRoles");
+                throw;
+            }
         }
 
         [HttpPut]

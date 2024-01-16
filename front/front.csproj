@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\Enums\UserRole.cs" />
+    <Compile Remove="Views\UserxUser\_AssociaRolesPartial.cshtml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
@@ -16,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Models\Enums\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 

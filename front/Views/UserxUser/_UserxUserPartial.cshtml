@@ -211,8 +211,7 @@ else
     }
 
     function AtualizaUsuario() {
-        var formData = $("#atualizarForm").serialize();
-        var btnClose = document.querySelector('.btn-close');
+        var formData = $("#atualizarForm").serialize();        
 
         $.ajax({
             url: "/UserxUser/atualizaruserxuser",

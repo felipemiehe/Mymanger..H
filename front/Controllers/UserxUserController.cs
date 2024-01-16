@@ -164,6 +164,60 @@ namespace front.Controllers
 
         }
 
+        [HttpPost("associaRoles")]
+        public async Task<IActionResult> associaRoles(AssociaRolesModel model)
+        {
+
+            if (ModelState.IsValid)
+            {
+                string data = JsonConvert.SerializeObject(model);
+                StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+                HttpClient configuredClient = new ClienteComCookie(Request).ConfiguredClient;
+                HttpResponseMessage response = await configuredClient.PostAsync(configuredClient.BaseAddress + "api/auth/associarole", content);
+
+
+                ResponseDTO Response = JsonConvert.DeserializeObject<ResponseDTO>(await response.Content.ReadAsStringAsync());
+                if (response.IsSuccessStatusCode)              
+                {
+                    return Json(new { success = true, message = Response?.Message ?? "Sucesso Ao adicionar Função" });
+                }
+
+                ModelState.AddModelError(string.Empty, Response?.Message ?? "Erro inesperado!");
+
+                return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_AssociaRolesPartial", model) });
+            }
+
+            return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_AssociaRolesPartial", model) });
+
+        }
+        
+        [HttpPost("removerRolesUser")]
+        public async Task<IActionResult> removerRolesUser(AssociaRolesModel model)
+        {
+
+            if (ModelState.IsValid)
+            {
+                string data = JsonConvert.SerializeObject(model);
+                StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+                HttpClient configuredClient = new ClienteComCookie(Request).ConfiguredClient;
+                HttpResponseMessage response = await configuredClient.PutAsync(configuredClient.BaseAddress + "api/auth/desssacociarroles", content);
+
+
+                ResponseDTO Response = JsonConvert.DeserializeObject<ResponseDTO>(await response.Content.ReadAsStringAsync());
+                if (response.IsSuccessStatusCode)              
+                {
+                    return Json(new { success = true, message = Response?.Message ?? "Sucesso Ao remover Função" });
+                }
+
+                ModelState.AddModelError(string.Empty, Response?.Message ?? "Erro inesperado!");
+
+                return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_AssociaRolesPartial", model) });
+            }
+
+            return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_AssociaRolesPartial", model) });
+
+        }
+
 
     }
 }

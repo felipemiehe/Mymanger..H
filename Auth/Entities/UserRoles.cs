@@ -8,7 +8,7 @@
         public const string Fiscais = "fiscais";
         public const string Reporter = "reporter";
         public const string TecnicoHidraulica = "Tecnico hidraulica";
-        public const string TecnicoEletrica = "Tecnico Tecnico eletrica";
+        public const string TecnicoEletrica = "Tecnico eletrica";
        
     }
 }
