@@ -87,8 +87,13 @@ namespace front.Controllers
         [HttpGet]
         public IActionResult GetUserList(int page = 1, int pageSize = 5)
         {
-            var userList = ObterListaUserXUser(page, pageSize);            
-            return PartialView("_UserxUserPartial", userList);
+            var userList = ObterListaUserXUser(page, pageSize);  
+            if(userList != null && userList.Count > 5)
+            {
+                return PartialView("_UserxUserPartial", userList);
+            }
+
+            return PartialView("_UserxUserPartial",  ObterListaUserXUser(1, 5));
         }                
      
 

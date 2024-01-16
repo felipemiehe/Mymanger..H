@@ -18,53 +18,7 @@
 <div class="card-body pt-4 p-3 mb-3">
     <div class="p-3 shadow">
         <div class="row">
-            <!-- Paginação -->
-            @if (Model != null && Model.Any())
-            {
-                var currentPage = ViewContext.HttpContext.Request.Query["page"];
-                int currentPageNumber = string.IsNullOrEmpty(currentPage) ? 1 : Convert.ToInt32(currentPage);
-                int itemsPerPage = 5;  
-
-                <div class="d-flex align-items-center gap-2">
-                    <div class="result-info">
-                        <p>@((currentPageNumber - 1) * itemsPerPage + 1) - @Math.Min(currentPageNumber * itemsPerPage, Model.First().TotalAchados) of @Model.First().TotalAchados</p>
-                    </div>
-
-                    <div class="pagination-container">
-                        @if (Model.First().TotalPages > 1)
-                        {
-                            <nav aria-label="Page navigation">
-                                <ul class="pagination">
-                                    @if (currentPageNumber > 1)
-                                    {
-                                        <li class="page-item">
-                                            <a class="page-link" href="@Url.Action("Index", new { page = currentPageNumber - 1 })" aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                    }
-
-                                    @for (var i = Math.Max(1, currentPageNumber - 1); i <= Math.Min(Model.First().TotalPages, currentPageNumber + 1); i++)
-                                    {
-                                        <li class="page-item @(i == currentPageNumber ? "active" : "")">
-                                            <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
-                                        </li>
-                                    }
-
-                                    @if (currentPageNumber < Model.First().TotalPages)
-                                    {
-                                        <li class="page-item">
-                                            <a class="page-link" href="@Url.Action("Index", new { page = currentPageNumber + 1 })" aria-label="Next">
-                                                <span aria-hidden="true">&raquo;</span>
-                                            </a>
-                                        </li>
-                                    }
-                                </ul>
-                            </nav>
-                        }
-                    </div>
-                </div>
-            }
+            
 
             <div class="col-md-6">
             <!-- Coluna da Lista de Usuários -->

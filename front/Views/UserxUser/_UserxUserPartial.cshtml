@@ -10,6 +10,10 @@
             };
 
     var atualiza = new AtualizaOutroUserModel();
+
+    var currentPage = ViewContext.HttpContext.Request.Query["page"];
+    int currentPageNumber = string.IsNullOrEmpty(currentPage) ? 1 : Convert.ToInt32(currentPage);
+    int itemsPerPage = 5;
 }
 
 
@@ -49,59 +53,111 @@
 @if (Model == null || !Model.Any())
 {
     <p>Sem usuários cadastrados nessa página!</p>
+   
+
 }
 else
 {
-    <ul id="userList" class="list-group">
-        @foreach (var item in Model)
-        {
-            <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg shadow-sm">
-                <div class="d-flex flex-column">
-                    <h6 class="mb-3 text-sm" style="display: flex; align-items: center;">
-                        <strong style="display: flex; gap: 30px;">
-                            <span>Nome: @Html.DisplayFor(modelItem => item.Nome)</span>
-                            <span>Código: @Html.DisplayFor(modelItem => item.CodigoUnico) <i title="Copiar Codigo" class="bi bi-clipboard copy-icon" onclick="copiarCodigoUnico('@item.CodigoUnico')"></i></span>                            
-                        </strong>
-                    </h6>
-                    <span class="mb-2 text-xs">Numero: <span class="text-dark font-weight-bold ms-sm-2"><strong>@Html.DisplayFor(modelItem => item.Numero)</strong></span></span>
-                    <span class="mb-2 text-xs">Email: <span class="text-dark ms-sm-2 font-weight-bold"><strong>@Html.DisplayFor(modelItem => item.Email)</strong></span></span>
-                    <span class="mb-2 text-xs">CPF: <span class="text-dark ms-sm-2 font-weight-bold"><strong>@Html.DisplayFor(modelItem => item.Cpf)</strong></span></span>
-                    <span class="text-xs">
-                        Funções:
-                        @if (item.Roles != null && item.Roles.Any())
-                        {
-                            var rolesString = string.Join(", ", item.Roles);
-                            <span class="text-dark ms-sm-2 font-weight-bold"><strong>@rolesString</strong></span>
-                        }
-                        else
-                        {
-                            <span class="text-dark ms-sm-2 font-weight-bold"><strong>Sem funções atribuídas</strong></span>
-                        }
-                    </span>
-                </div>
+    <div id="USERXUSER">       
+    <!-- Paginação --> 
+        <div class="d-flex align-items-center gap-2">
+            <div class="result-info">
+                @{
+                    var totalAchados = Model.First().TotalAchados;
+                    var displayValue = totalAchados <= 5 ? 1 : (currentPageNumber - 1) * itemsPerPage + 1;
+                    var maximoPagina = @Math.Min(currentPageNumber * itemsPerPage, totalAchados);
+                }
 
-                <div class="ms-auto text-end">
-                    <button class="btn btn-outline-danger  text-gradient px-3 mb-0" onclick="deletaUser('@item.Email')">
-                        Excluir
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
-                            <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5" />
-                        </svg>
-                    </button>
-                    <button class="btn btn-outline-primary px-3 mb-0"
-                            data-toggle="modal"
-                            data-target="#myModal"
-                            data-user-id="@item.CodigoUnico"
-                            onclick="obterDadosDoUsuario('@item.CodigoUnico')">
-                        Editar
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
-                        </svg>
-                    </button>
-                </div>
-            </li>
-        }
-    </ul>
+                <p>@displayValue - @maximoPagina de @totalAchados</p>
+            </div>
+                
+            <div class="pagination-container">
+                @if (Model.First().TotalPages > 1)
+                {
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            @if (currentPageNumber > 1)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Index", new { page = currentPageNumber - 1 })" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            }
+
+                            @for (var i = Math.Max(1, currentPageNumber - 1); i <= Math.Min(Model.First().TotalPages, currentPageNumber + 1); i++)
+                            {
+                                <li class="page-item @(i == currentPageNumber ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
+                                </li>
+                            }
+
+                            @if (currentPageNumber < Model.First().TotalPages)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Index", new { page = currentPageNumber + 1 })" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                }
+            </div>
+        </div>       
+    
+    
+        <ul id="userList" class="list-group">
+            @foreach (var item in Model)
+            {
+                <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg shadow-sm">
+                    <div class="d-flex flex-column">
+                        <h6 class="mb-3 text-sm" style="display: flex; align-items: center;">
+                            <strong style="display: flex; gap: 30px;">
+                                <span>Nome: @Html.DisplayFor(modelItem => item.Nome)</span>
+                                <span>Código: @Html.DisplayFor(modelItem => item.CodigoUnico) <i title="Copiar Codigo" class="bi bi-clipboard copy-icon" onclick="copiarCodigoUnico('@item.CodigoUnico')"></i></span>                            
+                            </strong>
+                        </h6>
+                        <span class="mb-2 text-xs">Numero: <span class="text-dark font-weight-bold ms-sm-2"><strong>@Html.DisplayFor(modelItem => item.Numero)</strong></span></span>
+                        <span class="mb-2 text-xs">Email: <span class="text-dark ms-sm-2 font-weight-bold"><strong>@Html.DisplayFor(modelItem => item.Email)</strong></span></span>
+                        <span class="mb-2 text-xs">CPF: <span class="text-dark ms-sm-2 font-weight-bold"><strong>@Html.DisplayFor(modelItem => item.Cpf)</strong></span></span>
+                        <span class="text-xs">
+                            Funções:
+                            @if (item.Roles != null && item.Roles.Any())
+                            {
+                                var rolesString = string.Join(", ", item.Roles);
+                                <span class="text-dark ms-sm-2 font-weight-bold"><strong>@rolesString</strong></span>
+                            }
+                            else
+                            {
+                                <span class="text-dark ms-sm-2 font-weight-bold"><strong>Sem funções atribuídas</strong></span>
+                            }
+                        </span>
+                    </div>
+
+                    <div class="ms-auto text-end">
+                        <button class="btn btn-outline-danger  text-gradient px-3 mb-0" onclick="deletaUser('@item.Email')">
+                            Excluir
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                                <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5" />
+                            </svg>
+                        </button>
+                        <button class="btn btn-outline-primary px-3 mb-0"
+                                data-toggle="modal"
+                                data-target="#myModal"
+                                data-user-id="@item.CodigoUnico"
+                                onclick="obterDadosDoUsuario('@item.CodigoUnico')">
+                            Editar
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+                            </svg>
+                        </button>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
 }
 
 <!-- Modal -->
@@ -125,21 +181,22 @@ else
 
 <script>
 
-    function refreshUserList() {        
-        var page = new URLSearchParams(window.location.search).get('page') || 1;
+    function refreshUserList() { 
 
+        var page = new URLSearchParams(window.location.search).get('page') || 1;       
+        
         $.ajax({
             url: '@Url.Action("GetUserList", "UserxUser")',
             type: 'GET',
             data: { page: page },
-            success: function (data) {
-                $("#userList").html(data);
+            success: function (data) { 
+                $("#USERXUSER").html(data);
             },
             error: function (error) {
                 showWarningNotification('Usuários não foram carregados corretamente');
             }
         });
-    }
+    }      
 
     function obterDadosDoUsuario(userId) {
         $.ajax({
@@ -157,7 +214,7 @@ else
 
     // Função da partial AtualizaOutroUser
     function AtualizaUsuario() {
-        var formData = $("#atualizarForm").serialize();
+        var formData = $("#atualizarForm").serialize();       
 
         $.ajax({
             url: "/UserxUser/atualizaruserxuser",
@@ -167,16 +224,18 @@ else
                 if (result.success === false) {
                     showErrorNotification("Erro ao atulizar usuario!");
                     $('.modal-body-edit-user').html(result.html);
-                } else {
-                    showSuccessNotification('Usuário Atualizado com sucesso'); 
+                } else {  
+                    showSuccessNotification('Usuário Atualizado com sucesso');   
+                    document.querySelector('.btn-close').click();
+                    refreshUserList()
                 }
             },
             error: function () {
-                console.log('Erro na requisição AJAX');
+                showErrorNotification('Erro na requisição');
             }
         });
     }
-
+   
 
     function copiarCodigoUnico(codigoUnico) {        
         var inputElement = document.createElement('input');
@@ -197,16 +256,18 @@ else
             url: '@Url.Action("deletauserxuser", "UserxUser")',
             type: 'POST',
             data: { email: email },
-            success: function (data) {
-                showSuccessNotification(data.message);
-                refreshUserList()
+            success: function (result) {
+                if (result.success === false) {
+                    showErrorNotification("Erro ao deletar usuario!");                    
+                } else {
+                    showSuccessNotification('Usuário deletado com sucesso');                    
+                    refreshUserList()
+                }
             },
-            error: function (data) {
-                showErrorNotification(data.message);
+            error: function () {
+                showErrorNotification('Erro na requisição AJAX');
             }
         });
     }
-    
-  
 
 </script>

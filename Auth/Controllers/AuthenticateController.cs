@@ -58,7 +58,14 @@ namespace Auth.Controllers
 
             return token;
         }
+        private async Task<int> GetTotalAchadosUserxAdmin(String userAdminId)
+        {
+            var totalRecords = await _context.UserxUsers
+                   .Where(x => x.User_Admin_Id == userAdminId)
+                   .CountAsync();
 
+            return totalRecords;
+        }
 
 
         [HttpPost]
@@ -496,15 +503,12 @@ namespace Auth.Controllers
         [HttpGet]        
         [Authorize(Roles = UserRoles.Admin)]
         [Route("pegaruserxuser")]
-        public async Task<IActionResult> PegarUserxUser([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> PegarUserxUser([FromQuery] int page = 1, [FromQuery] int pageSize = 5)
         {
             try
             {
                 var userAdminId = User.FindFirstValue("userId");
-
-                var totalRecords = await _context.UserxUsers
-                   .Where(x => x.User_Admin_Id == userAdminId)
-                   .CountAsync();
+                var totalRecords = await GetTotalAchadosUserxAdmin(userAdminId);
 
                 var userxusers = await _context.UserxUsers
                     .Where(x => x.User_Admin_Id == userAdminId)
@@ -671,6 +675,7 @@ namespace Auth.Controllers
                 if (!user.Equals(dto))
                 {
                     _context.Entry(user).CurrentValues.SetValues(dto);
+                    user.NormalizedEmail = dto.Email.Normalize().ToUpperInvariant();
                     await _context.SaveChangesAsync();
 
                     return Ok(user);
