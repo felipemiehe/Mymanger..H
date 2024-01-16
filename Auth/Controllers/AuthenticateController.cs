@@ -642,7 +642,35 @@ namespace Auth.Controllers
                 if (user == null)
                 {
                     return NotFound("Usuário não encontrado");
-                }                               
+                }
+
+                var errorMessages = new List<string>();
+
+                var existingUserWithSameEmail = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Email == dto.Email && u.Id != user.Id);
+                if (existingUserWithSameEmail != null)
+                {
+                    errorMessages.Add("E-mail já cadastrado por outro usuário.");
+                }
+
+                var existingUserWithSamePhoneNumber = await _context.Users
+                    .FirstOrDefaultAsync(u => u.PhoneNumber == dto.PhoneNumber && u.Id != user.Id);
+                if (existingUserWithSamePhoneNumber != null)
+                {
+                    errorMessages.Add("Número de telefone já cadastrado por outro usuário.");
+                }
+
+                var existingUserWithSameCpf = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Cpf == dto.Cpf && u.Id != user.Id);
+                if (existingUserWithSameCpf != null)
+                {
+                    errorMessages.Add("CPF já cadastrado por outro usuário.");
+                }
+
+                if(errorMessages.Count > 0)
+                {
+                    return BadRequest(errorMessages);
+                }
 
                 if (!user.Equals(dto))
                 {
@@ -655,21 +683,10 @@ namespace Auth.Controllers
 
                 return BadRequest("Os dados enviados são iguais aos dados existentes.");
             }
-            catch (Exception ex)
+            catch (DbUpdateConcurrencyException)
             {
-                if (ex.InnerException is SqlException sqlException && sqlException.Number == 2601)
-                {
-                    
-                    var errorMessage = sqlException.Message;
-
-                    // Extrai o valor duplicado da mensagem de erro
-                    var startIndex = errorMessage.IndexOf("(") + 1;
-                    var endIndex = errorMessage.IndexOf(")");
-                    var valorDuplicado = errorMessage.Substring(startIndex, endIndex - startIndex);
-
-                    return BadRequest(new ResponseDTO { Status = "Error", Message = $"O valor '{valorDuplicado}' já está em uso." });
-                }               
-                throw;
+                
+                return StatusCode(500, "Erro ao atualizar o usuário");
             }
         }
                
