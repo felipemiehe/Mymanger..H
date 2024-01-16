@@ -6,14 +6,27 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="errorModalTitle">@Model.Title</h5>
-                <button type="button" class="btn-close" onclick="hideErrorModal()" aria-label="Fechar"></button>
+                <button type="button" class="btn-close" onclick="fecharErrorModal()">
+                </button>
             </div>
             <div class="modal-body">
                 <div id="errorMessage">@Model.ErrorMessage</div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="hideErrorModal()">Fechar</button>
+                <button type="button" class="btn btn-secondary" onclick="fecharErrorModal()">Fechar</button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function fecharErrorModal() {
+        var errorModal = document.getElementById('errorModal');
+        if (errorModal) {
+            var bootstrapModal = bootstrap.Modal.getInstance(errorModal);
+            if (bootstrapModal) {
+                bootstrapModal.hide();
+            }
+        }
+    }
+</script>

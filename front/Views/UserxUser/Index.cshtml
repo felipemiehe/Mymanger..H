@@ -3,16 +3,13 @@
 
 @{
     ViewData["Title"] = "Index";
-    var registerUserModel = new front.Models.RegisterUserViewModel(); 
-    var errorModel = new ErrorModalModel();
+    var registerUserModel = new front.Models.RegisterUserViewModel();     
     var atualiza = new AtualizaOutroUserModel();    
 }
     
     
 
 <h1>Index</h1>
-
-<partial name="_ErrorModal" model="errorModel" />
 
 
 <div class="card-body pt-4 p-3 mb-3">
@@ -85,7 +82,7 @@
         function MostraMsgsuccess() {
             var mensagemSucesso = '@TempData["Sucesso"]';
             if (mensagemSucesso !== '') {
-                showErrorModal(mensagemSucesso, "Sucesso");
+                showSuccessNotification(mensagemSucesso);               
             }
         }
 

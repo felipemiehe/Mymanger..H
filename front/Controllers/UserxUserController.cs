@@ -131,7 +131,7 @@ namespace front.Controllers
                     string newUser = await response.Content.ReadAsStringAsync();
                     AtualizaOutroUserModel userModel = JsonConvert.DeserializeObject<AtualizaOutroUserModel>(newUser);
 
-                    return Json(new { success = true, html = Helper.RenderRazorViewToString(this, "_AtualizaOutroUserPartial", model) });
+                    return Json(new { success = true });
                 }
                 else
                 {

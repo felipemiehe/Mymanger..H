@@ -10,14 +10,19 @@ function hideLoadingModal() {
     $('#loadingModal').modal('hide');
 }
 
-function showErrorModal(message,title) {
-    $('#errorMessage').text(message);
-    $('#errorModalTitle').text(title);
-    $('#errorModal').modal('show');
+function showErrorModal(message, title, modalId) {
+    // Se modalId não for fornecido, use o ID padrão 'errorModal'
+    modalId = modalId || 'errorModal';
+
+    var modalSelector = '#' + modalId;
+
+    $(modalSelector + ' .modal-body #errorMessage').text(message);
+    $(modalSelector + ' .modal-header #errorModalTitle').text(title);
+
+    var modal = new bootstrap.Modal(document.getElementById(modalId));
+    modal.show();
 }
-function hideErrorModal() {
-    $('#errorModal').modal('hide');
-}
+
 
 function showSuccessNotification(message) {
     toastr.success(message, 'Sucesso');

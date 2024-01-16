@@ -3,12 +3,7 @@
 
 @using Auth.Entities
 
-@{
-    var errorModel = new ErrorModalModel
-            {
-                ErrorMessage = "Esta é uma mensagem de erro dinâmica."
-            };
-
+@{       
     var atualiza = new AtualizaOutroUserModel();
 
     var currentPage = ViewContext.HttpContext.Request.Query["page"];
@@ -45,8 +40,6 @@
     }       
 
 </style>
-
-<partial name="_ErrorModal" model="errorModel" />
 
 
 <!-- Coluna da Lista de Usuários -->
@@ -143,8 +136,8 @@ else
                             </svg>
                         </button>
                         <button class="btn btn-outline-primary px-3 mb-0"
-                                data-toggle="modal"
-                                data-target="#myModal"
+                                data-bs-toggle="modal"
+                                data-bs-target="#myModal"
                                 data-user-id="@item.CodigoUnico"
                                 onclick="obterDadosDoUsuario('@item.CodigoUnico')">
                             Editar
@@ -166,7 +159,7 @@ else
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Atualizar Usuário</h5>
-                <button type="button" class="btn-close" data-dismiss="modal">
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
                 </button>
             </div>
             <div class="modal-body modal-body-edit-user">
@@ -179,24 +172,29 @@ else
 
 
 
-<script>
+<script>      
+   
 
-    function refreshUserList() { 
+    function refreshUserList() {
+        return new Promise(function (resolve, reject) {
+            var page = new URLSearchParams(window.location.search).get('page') || 1;
 
-        var page = new URLSearchParams(window.location.search).get('page') || 1;       
-        
-        $.ajax({
-            url: '@Url.Action("GetUserList", "UserxUser")',
-            type: 'GET',
-            data: { page: page },
-            success: function (data) { 
-                $("#USERXUSER").html(data);
-            },
-            error: function (error) {
-                showWarningNotification('Usuários não foram carregados corretamente');
-            }
+
+            $.ajax({
+                url: '@Url.Action("GetUserList", "UserxUser")',
+                type: 'GET',
+                data: { page: page },
+                success: function (data) {
+                    $("#USERXUSER").html(data);
+                    resolve();  // Resolve a Promise quando a operação for concluída com sucesso
+                },
+                error: function (error) {
+                    showWarningNotification('Usuários não foram carregados corretamente');
+                    reject(error);  // Rejeita a Promise em caso de erro
+                }
+            });
         });
-    }      
+    }
 
     function obterDadosDoUsuario(userId) {
         $.ajax({
@@ -212,9 +210,9 @@ else
         });
     }
 
-    // Função da partial AtualizaOutroUser
     function AtualizaUsuario() {
-        var formData = $("#atualizarForm").serialize();       
+        var formData = $("#atualizarForm").serialize();
+        var btnClose = document.querySelector('.btn-close');
 
         $.ajax({
             url: "/UserxUser/atualizaruserxuser",
@@ -222,15 +220,22 @@ else
             data: formData,
             success: function (result) {
                 if (result.success === false) {
-                    showErrorNotification("Erro ao atulizar usuario!");
+                    showErrorNotification("Erro ao atualizar usuário!");
                     $('.modal-body-edit-user').html(result.html);
-                } else {  
-                    showSuccessNotification('Usuário Atualizado com sucesso');   
-                    document.querySelector('.btn-close').click();
+                } else {                   
                     refreshUserList()
+                        .then(function () {
+
+                            showSuccessNotification('Usuário Atualizado com sucesso');
+                            $('#myModal').remove();                            
+                        })
+                        .catch(function (error) {                           
+                            showErrorNotification('Error ao Atualizar Usuário');
+                        });
                 }
             },
-            error: function () {
+            error: function (xhr, status, error) {
+                console.error('Erro na requisição:', status, error);
                 showErrorNotification('Erro na requisição');
             }
         });
