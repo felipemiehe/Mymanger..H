@@ -88,7 +88,7 @@ namespace front.Controllers
         public IActionResult GetUserList(int page = 1, int pageSize = 5)
         {
             var userList = ObterListaUserXUser(page, pageSize);  
-            if(userList != null && userList.Count > 5)
+            if(userList != null && userList.Count > 0)
             {
                 return PartialView("_UserxUserPartial", userList);
             }
