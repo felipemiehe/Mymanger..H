@@ -441,7 +441,12 @@ namespace Auth.Migrations
                     b.Property<string>("RoleId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("RoleId");
 
@@ -552,7 +557,7 @@ namespace Auth.Migrations
                         .IsRequired();
 
                     b.HasOne("Auth.Entities.ApplicationUser", "User")
-                        .WithMany("UserAdminRolescontrols")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -610,6 +615,10 @@ namespace Auth.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
+                    b.HasOne("Auth.Entities.ApplicationUser", null)
+                        .WithMany("Roles")
+                        .HasForeignKey("ApplicationUserId");
+
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
@@ -634,7 +643,7 @@ namespace Auth.Migrations
 
             modelBuilder.Entity("Auth.Entities.ApplicationUser", b =>
                 {
-                    b.Navigation("UserAdminRolescontrols");
+                    b.Navigation("Roles");
                 });
 
             modelBuilder.Entity("Auth.Entities.Ativo", b =>

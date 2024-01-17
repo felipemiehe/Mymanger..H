@@ -17,10 +17,10 @@ namespace front.Controllers
     {
 
 
-        private List<UserXUserViewModel> ObterListaUserXUser(int page, int pageSize)
+        private List<UserXUserViewModel> ObterListaUserXUser(int page, int pageSize, string roleFIlter="")
         {
             HttpClient configuredClient = new ClienteComCookie(Request).ConfiguredClient;
-            HttpResponseMessage response = configuredClient.GetAsync(configuredClient.BaseAddress + $"api/auth/pegaruserxuser?page={page}&pageSize={pageSize}").Result;
+            HttpResponseMessage response = configuredClient.GetAsync(configuredClient.BaseAddress + $"api/auth/pegaruserxuser?page={page}&pageSize={pageSize}&roleFilter={roleFIlter}").Result;
 
             if (response.IsSuccessStatusCode)
             {

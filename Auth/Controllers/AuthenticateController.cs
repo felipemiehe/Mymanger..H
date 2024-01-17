@@ -16,6 +16,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Auth.Controllers
 {
@@ -528,12 +529,40 @@ namespace Auth.Controllers
         {
             try
             {
-                                
                 var userAdminId = User.FindFirstValue("userId");
-                var totalRecords = await GetTotalAchadosUserxAdmin(userAdminId);
 
-                var userxusers = await _context.UserxUsers
-                    .Where(x => x.User_Admin_Id == userAdminId)
+                // Pegar roleId com base no nome da role
+                var roleId = await _context.Roles
+                    .Where(r => r.Name == roleFilter)
+                    .Select(r => r.Id)
+                    .FirstOrDefaultAsync();
+
+                // Inicializar a consulta sem filtros específicos
+                var query = _context.UserxUsers
+                    .Where(xx => xx.User_Admin_Id == userAdminId);
+
+                // Verificar se roleId está presente e não é vazio
+                if (!string.IsNullOrEmpty(roleId))
+                {
+                    // Pegar userIds com base no roleId
+                    var userIds = await _context.UserRoles
+                        .Where(ur => ur.RoleId == roleId)
+                        .Select(ur => ur.UserId)
+                        .ToListAsync();
+
+                    // Verificar se userIds está presente e não está vazio
+                    if (userIds != null && userIds.Any())
+                    {
+                        query = query.Where(uu => userIds.Contains(uu.User_Agregado_Id));
+                    }
+                    else
+                    {                        
+                        return NoContent(); 
+                    }
+                }
+              
+
+                var userxUserRecords = await query
                     .OrderByDescending(x => x.Data_criacao)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
@@ -541,7 +570,7 @@ namespace Auth.Controllers
 
                 var userXUserList = new List<UserXUserResponseDTO>();
 
-                foreach (var userxuser in userxusers)
+                foreach (var userxuser in userxUserRecords)
                 {
                     var user = await _userManager.FindByIdAsync(userxuser.User_Agregado_Id);
 
@@ -558,8 +587,8 @@ namespace Auth.Controllers
                             user.Cpf,
                             user.CodigoUnico,
                             roles.ToList(),
-                            totalRecords,
-                            (int)Math.Ceiling((double)totalRecords / pageSize)
+                            userxUserRecords.Count(),
+                            (int)Math.Ceiling((double)userxUserRecords.Count() / pageSize)
                         );
 
                         userXUserList.Add(userXUserDTO);
@@ -568,10 +597,10 @@ namespace Auth.Controllers
 
                 return Ok(userXUserList);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 _logger.LogWarning("Erro ao pegarUserxUser");
-                return NotFound(new ResponseDTO { Status = "Error", Message = "Não foi possível obter os dados de UserxUser." });
+                return NotFound(new ResponseDTO { Status = "Error", Message = e.ToString() });
             }
         }
 

@@ -20,7 +20,7 @@ namespace Auth.Entities
 
         public DateTime Data_criacao { get; set; } = DateTime.Now;
 
-        public ICollection<UserAdminRolescontrol> UserAdminRolescontrols { get; set; }        
+        public ICollection<IdentityUserRole<string>> Roles { get; set; }
 
 
     }

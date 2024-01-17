@@ -71,12 +71,7 @@ namespace Auth.DbContext
                 .HasOne(dp => dp.Chamado)
                 .WithMany(c => c.Data_pause)
                 .HasForeignKey(dp => dp.Chamado_id)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.Entity<UserAdminRolescontrol>()
-               .HasOne(ur => ur.User)
-               .WithMany(u => u.UserAdminRolescontrols)
-               .HasForeignKey(ur => ur.UserId);
+                .OnDelete(DeleteBehavior.Cascade);           
 
             builder.Entity<UserAdminRolescontrol>()
                 .HasOne(ur => ur.Role)
