@@ -7,7 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Models\Enums\UserRole.cs" />
+    <Compile Remove="Models\Enums\**" />
+    <Content Remove="Models\Enums\**" />
+    <EmbeddedResource Remove="Models\Enums\**" />
+    <None Remove="Models\Enums\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Views\UserxUser\_AssociaRolesPartial.cshtml.cs" />
   </ItemGroup>
 
@@ -21,7 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Enums\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 

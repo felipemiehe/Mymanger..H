@@ -7,7 +7,7 @@
     var atualiza = new AtualizaOutroUserModel();
     var associa = new AssociaRolesModel();
 }
-    
+
     
 
 <h1>Index</h1>
@@ -30,7 +30,7 @@
             </div>
 
             <!-- Coluna do Associa  -->
-             <div class="col-md-3">
+            <div class="col-md-3" id="stickytypeheader">
                 <div class="card p-3 shadow associarolesclass">                    
                     <partial name="_AssociaRolesPartial" model="associa" />
                 </div>
@@ -72,7 +72,9 @@
                     } else {
                         refreshUserList()
                             .then(function () {
-                                showSuccessNotification('Usuário Atualizado com sucesso');                                
+                                showSuccessNotification('Usuário Atualizado com sucesso');
+                                // tem que remover o modal quando da um refresh list ele pega alguma referencia
+                                $('#myModal').remove();
                             })
                             .catch(function (error) {
                                 showErrorNotification('Error ao Atualizar Usuário');
@@ -101,6 +103,8 @@
                         refreshUserList()
                             .then(function () {
                                 showSuccessNotification('Função removodida');
+                                // tem que remover o modal quando da um refresh list ele pega alguma referencia
+                                $('#myModal').remove();
                             })
                             .catch(function (error) {
                                 showErrorNotification('Error ao remvoer função');
@@ -113,6 +117,18 @@
                 }
             });
         }
+
+        $(function () {
+            var stickyHeaderTop = $('#stickytypeheader').offset().top;
+
+            $(window).scroll(function () {
+                if ($(window).scrollTop() > stickyHeaderTop) {
+                    $('#stickytypeheader').css({ position: 'fixed', top: '0px', right: '0px' });
+                } else {
+                    $('#stickytypeheader').css({ position: 'static', top: '0px', right: 'auto' });
+                }
+            });
+        });
 
     </script>
     

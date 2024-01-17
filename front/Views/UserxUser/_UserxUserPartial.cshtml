@@ -177,9 +177,7 @@ else
 
     function refreshUserList() {
         return new Promise(function (resolve, reject) {
-            var page = new URLSearchParams(window.location.search).get('page') || 1;
-
-
+            var page = new URLSearchParams(window.location.search).get('page') || 1;            
             $.ajax({
                 url: '@Url.Action("GetUserList", "UserxUser")',
                 type: 'GET',
