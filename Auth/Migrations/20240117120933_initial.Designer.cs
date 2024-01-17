@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Auth.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240114114055_Initial")]
-    partial class Initial
+    [Migration("20240117120933_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -182,7 +182,7 @@ namespace Auth.Migrations
 
                     b.Property<string>("Dono_chamado_user_ID")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("Em_orcamento")
                         .HasColumnType("bit");
@@ -200,7 +200,7 @@ namespace Auth.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Responsavel_user_ID")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
@@ -209,6 +209,10 @@ namespace Auth.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Ativo_Id");
+
+                    b.HasIndex("Dono_chamado_user_ID");
+
+                    b.HasIndex("Responsavel_user_ID");
 
                     b.ToTable("Chamados");
                 });
@@ -221,15 +225,26 @@ namespace Auth.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int?>("ChamadoId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Chamado_id")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Data")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("pausado_por_id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("ChamadoId");
+
                     b.HasIndex("Chamado_id");
+
+                    b.HasIndex("pausado_por_id");
 
                     b.ToTable("DataPauses");
                 });
@@ -292,18 +307,25 @@ namespace Auth.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<DateTime>("Data_criacao")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("User_Admin_Id")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("User_Admin_agregado")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("User_Agregado_Id")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("User_Admin_Id");
+
+                    b.HasIndex("User_Agregado_Id");
 
                     b.ToTable("UserxUsers");
                 });
@@ -473,18 +495,43 @@ namespace Auth.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Auth.Entities.ApplicationUser", "DonoChamado")
+                        .WithMany()
+                        .HasForeignKey("Dono_chamado_user_ID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Auth.Entities.ApplicationUser", "Responsavel")
+                        .WithMany()
+                        .HasForeignKey("Responsavel_user_ID");
+
                     b.Navigation("Ativo");
+
+                    b.Navigation("DonoChamado");
+
+                    b.Navigation("Responsavel");
                 });
 
             modelBuilder.Entity("Auth.Entities.DataPause", b =>
                 {
-                    b.HasOne("Auth.Entities.Chamado", "Chamado")
+                    b.HasOne("Auth.Entities.Chamado", null)
                         .WithMany("Data_pause")
+                        .HasForeignKey("ChamadoId");
+
+                    b.HasOne("Auth.Entities.Chamado", "Chamado")
+                        .WithMany()
                         .HasForeignKey("Chamado_id")
+                        .IsRequired();
+
+                    b.HasOne("Auth.Entities.ApplicationUser", "PausadoPor")
+                        .WithMany()
+                        .HasForeignKey("pausado_por_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Chamado");
+
+                    b.Navigation("PausadoPor");
                 });
 
             modelBuilder.Entity("Auth.Entities.FotoUrl", b =>
@@ -515,6 +562,25 @@ namespace Auth.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Auth.Entities.UserxUser", b =>
+                {
+                    b.HasOne("Auth.Entities.ApplicationUser", "UserAdmin")
+                        .WithMany()
+                        .HasForeignKey("User_Admin_Id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Auth.Entities.ApplicationUser", "UserAgregado")
+                        .WithMany()
+                        .HasForeignKey("User_Agregado_Id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("UserAdmin");
+
+                    b.Navigation("UserAgregado");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

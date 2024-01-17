@@ -83,6 +83,23 @@ namespace Auth.DbContext
                 .WithMany(r => r.UserAdminRolescontrols)
                 .HasForeignKey(ur => ur.RoleId);
 
+            builder.Entity<UserxUser>()
+                .HasOne(uu => uu.UserAdmin)
+                .WithMany()
+                .HasForeignKey(uu => uu.User_Admin_Id)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<UserxUser>()
+                .HasOne(uu => uu.UserAgregado)
+                .WithMany()
+                .HasForeignKey(uu => uu.User_Agregado_Id)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<DataPause>()
+                .HasOne(dp => dp.Chamado)
+                .WithMany()
+                .HasForeignKey(uu => uu.Chamado_id)
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
         }
     }

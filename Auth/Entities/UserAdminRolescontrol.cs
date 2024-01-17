@@ -14,7 +14,7 @@ namespace Auth.Entities
         public string UserId { get; set; }
         [Required]
         public string RoleId { get; set; }
-
+        
         public ApplicationUser User { get; set; }
         public ApplicationRoles Role { get; set; }
     }

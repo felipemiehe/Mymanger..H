@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Auth.Migrations
 {
-    public partial class Initial : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -65,21 +65,6 @@ namespace Auth.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Ativos", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserxUsers",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    User_Admin_Id = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    User_Agregado_Id = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    User_Admin_agregado = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserxUsers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -216,6 +201,32 @@ namespace Auth.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserxUsers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    User_Admin_Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    User_Agregado_Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Data_criacao = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    User_Admin_agregado = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserxUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserxUsers_AspNetUsers_User_Admin_Id",
+                        column: x => x.User_Admin_Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_UserxUsers_AspNetUsers_User_Agregado_Id",
+                        column: x => x.User_Agregado_Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AtivoxUsers",
                 columns: table => new
                 {
@@ -250,13 +261,24 @@ namespace Auth.Migrations
                     Em_pause = table.Column<bool>(type: "bit", nullable: false),
                     Em_vistoria = table.Column<bool>(type: "bit", nullable: false),
                     Em_orcamento = table.Column<bool>(type: "bit", nullable: false),
-                    Responsavel_user_ID = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Dono_chamado_user_ID = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Responsavel_user_ID = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Dono_chamado_user_ID = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Ativo_Id = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Chamados", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Chamados_AspNetUsers_Dono_chamado_user_ID",
+                        column: x => x.Dono_chamado_user_ID,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Chamados_AspNetUsers_Responsavel_user_ID",
+                        column: x => x.Responsavel_user_ID,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Chamados_Ativos_Ativo_Id",
                         column: x => x.Ativo_Id,
@@ -272,17 +294,29 @@ namespace Auth.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Chamado_id = table.Column<int>(type: "int", nullable: false),
-                    Data = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    pausado_por_id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Data = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ChamadoId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DataPauses", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_DataPauses_AspNetUsers_pausado_por_id",
+                        column: x => x.pausado_por_id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_DataPauses_Chamados_Chamado_id",
                         column: x => x.Chamado_id,
                         principalTable: "Chamados",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_DataPauses_Chamados_ChamadoId",
+                        column: x => x.ChamadoId,
+                        principalTable: "Chamados",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -381,9 +415,29 @@ namespace Auth.Migrations
                 column: "Ativo_Id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Chamados_Dono_chamado_user_ID",
+                table: "Chamados",
+                column: "Dono_chamado_user_ID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Chamados_Responsavel_user_ID",
+                table: "Chamados",
+                column: "Responsavel_user_ID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DataPauses_Chamado_id",
                 table: "DataPauses",
                 column: "Chamado_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DataPauses_ChamadoId",
+                table: "DataPauses",
+                column: "ChamadoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DataPauses_pausado_por_id",
+                table: "DataPauses",
+                column: "pausado_por_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_fotoUrls_Chamado_id",
@@ -399,6 +453,16 @@ namespace Auth.Migrations
                 name: "IX_UserAdminRolescontrols_UserId",
                 table: "UserAdminRolescontrols",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserxUsers_User_Admin_Id",
+                table: "UserxUsers",
+                column: "User_Admin_Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserxUsers_User_Agregado_Id",
+                table: "UserxUsers",
+                column: "User_Agregado_Id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

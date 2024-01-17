@@ -67,6 +67,22 @@ namespace Auth.Controllers
             return totalRecords;
         }
 
+        //private IQueryable<UserxUser> ApplyFilters(IQueryable<UserxUser> query, string roleFilter, string allFilter)
+        //{
+        //    if (!string.IsNullOrEmpty(roleFilter))
+        //    {
+        //        query = query.Where(x => x.User.Roles.Contains(roleFilter));
+        //    }
+
+        //    if (!string.IsNullOrEmpty(allFilter))
+        //    {
+        //        // Adicione lógica de filtro para allFilter
+        //        // Exemplo: query = query.Where(x => x.Nome.Contains(allFilter));
+        //    }
+
+        //    return query;
+        //}
+
 
         [HttpPost]
         [Route("login")]
@@ -503,10 +519,16 @@ namespace Auth.Controllers
         [HttpGet]        
         [Authorize(Roles = UserRoles.Admin)]
         [Route("pegaruserxuser")]
-        public async Task<IActionResult> PegarUserxUser([FromQuery] int page = 1, [FromQuery] int pageSize = 5)
+        public async Task<IActionResult> PegarUserxUser(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 5,
+            [FromQuery] string? allFilter = "",
+            [FromQuery] string? roleFilter = ""
+            )
         {
             try
             {
+                                
                 var userAdminId = User.FindFirstValue("userId");
                 var totalRecords = await GetTotalAchadosUserxAdmin(userAdminId);
 

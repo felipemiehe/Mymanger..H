@@ -22,7 +22,14 @@ namespace Auth.Entities
 
         public DateTime Data_criacao { get; set; } = DateTime.Now;
         public string? User_Admin_agregado { get; set; }
-        
+
+        // Propriedades de navegação
+        [ForeignKey("User_Admin_Id")]
+        public ApplicationUser? UserAdmin { get; set; }
+
+        [ForeignKey("User_Agregado_Id")]
+        public ApplicationUser? UserAgregado { get; set; }
+
 
     }
 }
