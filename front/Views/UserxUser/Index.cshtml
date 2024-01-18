@@ -15,10 +15,44 @@
 
 <div class="card-body pt-4 p-3 mb-3">
     <div class="p-3 shadow">
-        <div class="row">
-            
+        <div class="row">           
 
             <div class="col-md-6">
+                <!-- Coluna dos filtros -->                
+                <form class="card-body shadow-sm mb-3" id="filtarForm">
+                    <h5 class="mb-4">Filtros</h5>
+
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="cpf">CPF</label>
+                            <input type="text" class="form-control" id="cpf" placeholder="Digite o CPF">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="email">Email</label>
+                            <input type="text" class="form-control" id="email" placeholder="Digite o Email">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="codigoUnico">Código Único</label>
+                            <input type="text" class="form-control" id="codigoUnico" placeholder="Digite o Código Único">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="nome">Nome</label>
+                            <input type="text" class="form-control" id="nome" placeholder="Digite o Nome">
+                        </div>
+                        <div class="mb-3">
+                            <label for="roleSelect" class="form-label">Filtrar por função</label>
+                            <select class="form-select" id="roleSelect">
+                                <option value="">Escolha uma função</option>
+                                <option value="@UserRoles.TecnicoGeral">Técnico Geral</option>
+                                <option value="@UserRoles.Fiscais">Fiscais</option>
+                                <option value="@UserRoles.Reporter">Reporter</option>
+                                <option value="@UserRoles.TecnicoHidraulica">Técnico Hidráulica</option>
+                                <option value="@UserRoles.TecnicoEletrica">Técnico Eletrica</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary mx-auto d-block" style="max-width:100px;" type="button" onclick="chamaFiltro()">Filtrar</button>
+                    </div>
+                </form>
             <!-- Coluna da Lista de Usuários -->
             <partial name="_UserxUserPartial" model="Model"/>       
             </div>
@@ -115,6 +149,51 @@
                     //console.error('Erro na requisição:', status, error);
                     showErrorNotification('Erro na requisição');
                 }
+            });
+        }
+
+        // função que chama a promisse para remover o modal que buga
+        function chamaFiltro() {
+            filtrarUsuarios()
+                .then(function () {
+                    // Tem que remover o modal quando dá um refresh list                    
+                    $('#myModal').remove();
+                })
+                .catch(function (error) {
+                    showErrorNotification('Erro ao filtrar usuários');
+                });
+        }
+
+        // Função para filtrar usuários
+        function filtrarUsuarios() {
+            return new Promise(function (resolve, reject) {
+                var page = 1;
+                var cpf = $("#cpf").val();
+                var email = $("#email").val();
+                var codigoUnico = $("#codigoUnico").val();
+                var nome = $("#nome").val();
+                var role = $("#roleSelect").val();
+
+                $.ajax({
+                    url: '@Url.Action("GetUserList", "UserxUser")',
+                    type: 'GET',
+                    data: {
+                        page: page,
+                        cpf: cpf,
+                        email: email,
+                        codigoUnico: codigoUnico,
+                        nome: nome,
+                        role: role
+                    },
+                    success: function (data) {
+                        $("#USERXUSER").html(data);
+                        resolve();  
+                    },
+                    error: function (error) {
+                        showWarningNotification('Não foi possivel filtrar');
+                        reject(error); 
+                    }
+                });
             });
         }
 

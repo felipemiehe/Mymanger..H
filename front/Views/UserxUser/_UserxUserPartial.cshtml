@@ -52,8 +52,8 @@
 else
 {
     <div id="USERXUSER">       
-    <!-- Paginação --> 
-        <div class="d-flex align-items-center gap-2">
+    <!-- Paginação -->
+        <div class="d-flex align-items-center gap-2 justify-content-center">
             <div class="result-info">
                 @{
                     var totalAchados = Model.First().TotalAchados;
@@ -177,7 +177,7 @@ else
 
     function refreshUserList() {
         return new Promise(function (resolve, reject) {
-            var page = new URLSearchParams(window.location.search).get('page') || 1;            
+            var page = new URLSearchParams(window.location.search).get('page') || 1;  
             $.ajax({
                 url: '@Url.Action("GetUserList", "UserxUser")',
                 type: 'GET',

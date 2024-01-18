@@ -17,10 +17,12 @@ namespace front.Controllers
     {
 
 
-        private List<UserXUserViewModel> ObterListaUserXUser(int page, int pageSize, string roleFIlter="")
+        private List<UserXUserViewModel> ObterListaUserXUser(int page, int pageSize, string? roleFIlter = null, string? cpf = null, string? email = null, string? codigoUnico = null, string? nome = null)
         {
             HttpClient configuredClient = new ClienteComCookie(Request).ConfiguredClient;
-            HttpResponseMessage response = configuredClient.GetAsync(configuredClient.BaseAddress + $"api/auth/pegaruserxuser?page={page}&pageSize={pageSize}&roleFilter={roleFIlter}").Result;
+            HttpResponseMessage response = configuredClient.GetAsync(configuredClient.BaseAddress 
+                +$"api/auth/pegaruserxuser?page={page}&pageSize={pageSize}&roleFilter={roleFIlter}&cpf={cpf}&email={email}&codigoUnico={codigoUnico}&nome={nome}")
+                .Result;
 
             if (response.IsSuccessStatusCode)
             {
@@ -40,9 +42,9 @@ namespace front.Controllers
 
         [Authorize(Roles = UserRoles.Admin)]
         [HttpGet("UserxUser")]
-        public IActionResult Index(int page = 1, int pageSize = 5)
+        public IActionResult Index(int page = 1, int pageSize = 5, string? roleFIlter = null, string? cpf = null, string? email = null, string? codigoUnico = null, string? nome = null)
         {
-            List<UserXUserViewModel> userList = ObterListaUserXUser(page, pageSize);
+            List<UserXUserViewModel> userList = ObterListaUserXUser(page, pageSize, roleFIlter, cpf, email, codigoUnico, nome);
 
             if (userList != null)
             {                
@@ -85,10 +87,10 @@ namespace front.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetUserList(int page = 1, int pageSize = 5)
+        public IActionResult GetUserList(int page = 1, int pageSize = 5, string? roleFIlter = null, string? cpf = null, string? email = null, string? codigoUnico = null, string? nome = null)
         {
-            var userList = ObterListaUserXUser(page, pageSize);  
-            if(userList != null && userList.Count > 0)
+            var userList = ObterListaUserXUser(page, pageSize, roleFIlter, cpf, email, codigoUnico, nome);  
+            if(userList != null && userList.Count > 0 || roleFIlter != null || cpf != null || email != null || codigoUnico!= null || nome != null )
             {
                 return PartialView("_UserxUserPartial", userList);
             }
