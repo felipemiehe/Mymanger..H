@@ -49,8 +49,18 @@
                                 <option value="@UserRoles.TecnicoHidraulica">Técnico Hidráulica</option>
                                 <option value="@UserRoles.TecnicoEletrica">Técnico Eletrica</option>
                             </select>
+                        </div> 
+                        <div class="mx-auto d-block text-center gap-2">
+                            <button class="btn btn-primary" style="max-width:100px;" type="button" onclick="chamaFiltro()">
+                                Filtrar
+                                <i class="bi bi-search"></i>
+                            </button>
+                            <button class="btn btn-outline-danger " style="max-width:100px;" type="button" onclick="limpaFiltro()">
+                                Limpar
+                                <i class="bi bi-x-square"></i>
+                            </button>
                         </div>
-                        <button class="btn btn-primary mx-auto d-block" style="max-width:100px;" type="button" onclick="chamaFiltro()">Filtrar</button>
+                          
                     </div>
                 </form>
             <!-- Coluna da Lista de Usuários -->
@@ -152,7 +162,7 @@
             });
         }
 
-        // função que chama a promisse para remover o modal que buga
+        // função que chama a promisse para remover o modal que buga e aplicarfiltro
         function chamaFiltro() {
             filtrarUsuarios()
                 .then(function () {
@@ -161,6 +171,22 @@
                 })
                 .catch(function (error) {
                     showErrorNotification('Erro ao filtrar usuários');
+                });
+        }
+        // função que chama a promisse para remover o modal que buga e limpar filtro
+        function limpaFiltro() {
+                $("#cpf").val("");
+                $("#email").val("");
+                $("#codigoUnico").val("");
+                $("#nome").val("");
+                $("#roleSelect").val("");
+            filtrarUsuarios()
+                .then(function () {
+                    // Tem que remover o modal quando dá um refresh list
+                    $('#myModal').remove();
+                })
+                .catch(function (error) {
+                    showErrorNotification('Erro ao limpar filtrar usuários');
                 });
         }
 
@@ -183,7 +209,7 @@
                         email: email,
                         codigoUnico: codigoUnico,
                         nome: nome,
-                        role: role
+                        roleFIlter: role
                     },
                     success: function (data) {
                         $("#USERXUSER").html(data);
