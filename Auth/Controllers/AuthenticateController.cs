@@ -575,16 +575,23 @@ namespace Auth.Controllers
                            );
                 }
 
+
+
                 var userxUserRecords = await query
-                    .Include(uu => uu.UserAgregado)
-                    .OrderByDescending(x => x.Data_criacao)
+                     .Include(uu => uu.UserAgregado)
+                     .OrderByDescending(x => x.Data_criacao)
+                     .ToListAsync();
+
+                var totalRecords = userxUserRecords.Count();
+
+                var paginatedUsers = userxUserRecords
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
-                    .ToListAsync();
+                    .ToList();
 
                 var userXUserList = new List<UserXUserResponseDTO>();
 
-                foreach (var userxuser in userxUserRecords)
+                foreach (var userxuser in paginatedUsers)
                 {
                     var user = userxuser.UserAgregado;
 
@@ -601,8 +608,8 @@ namespace Auth.Controllers
                             user.Cpf,
                             user.CodigoUnico,
                             roles.ToList(),
-                            userxUserRecords.Count(),
-                            (int)Math.Ceiling((double)userxUserRecords.Count() / pageSize)
+                            totalRecords,
+                            (int)Math.Ceiling((double)totalRecords / pageSize)
                         );
 
                         userXUserList.Add(userXUserDTO);
