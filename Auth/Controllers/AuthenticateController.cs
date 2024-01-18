@@ -59,32 +59,7 @@ namespace Auth.Controllers
 
             return token;
         }
-        private async Task<int> GetTotalAchadosUserxAdmin(String userAdminId)
-        {
-            var totalRecords = await _context.UserxUsers
-                   .Where(x => x.User_Admin_Id == userAdminId)
-                   .CountAsync();
-
-            return totalRecords;
-        }
-
-        //private IQueryable<UserxUser> ApplyFilters(IQueryable<UserxUser> query, string roleFilter, string allFilter)
-        //{
-        //    if (!string.IsNullOrEmpty(roleFilter))
-        //    {
-        //        query = query.Where(x => x.User.Roles.Contains(roleFilter));
-        //    }
-
-        //    if (!string.IsNullOrEmpty(allFilter))
-        //    {
-        //        // Adicione lógica de filtro para allFilter
-        //        // Exemplo: query = query.Where(x => x.Nome.Contains(allFilter));
-        //    }
-
-        //    return query;
-        //}
-
-
+        
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO dto)
@@ -574,8 +549,6 @@ namespace Auth.Controllers
                                (string.IsNullOrEmpty(nome) || uu.UserAgregado.Name.Contains(nome))
                            );
                 }
-
-
 
                 var userxUserRecords = await query
                      .Include(uu => uu.UserAgregado)
