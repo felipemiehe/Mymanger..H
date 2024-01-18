@@ -169,7 +169,7 @@ namespace front.Controllers
         [HttpPost("associaRoles")]
         public async Task<IActionResult> associaRoles(AssociaRolesModel model)
         {
-
+            ViewData["requestForm"] = "associaRoles";
             if (ModelState.IsValid)
             {
                 string data = JsonConvert.SerializeObject(model);
