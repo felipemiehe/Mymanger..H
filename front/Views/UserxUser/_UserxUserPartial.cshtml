@@ -108,7 +108,10 @@ else
                         <h6 class="mb-3 text-sm" style="display: flex; align-items: center;">
                             <strong style="display: flex; gap: 30px;">
                                 <span>Nome: @Html.DisplayFor(modelItem => item.Nome)</span>
-                                <span>Código: @Html.DisplayFor(modelItem => item.CodigoUnico) <i title="Copiar Codigo" class="bi bi-clipboard copy-icon" onclick="copiarCodigoUnico('@item.CodigoUnico')"></i></span>                            
+                                <span title="@item.CodigoUnico">
+                                    Código: @Html.DisplayFor(modelItem => item.CodigoUnicoExibicao)
+                                    <i title="Copiar Codigo" class="bi bi-clipboard copy-icon" onclick="copiarCodigoUnico('@item.CodigoUnico')"></i>
+                                </span>
                             </strong>
                         </h6>
                         <span class="mb-2 text-xs">Numero: <span class="text-dark font-weight-bold ms-sm-2"><strong>@Html.DisplayFor(modelItem => item.Numero)</strong></span></span>
