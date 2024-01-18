@@ -523,8 +523,11 @@ namespace Auth.Controllers
         public async Task<IActionResult> PegarUserxUser(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 5,
-            [FromQuery] string? allFilter = "",
-            [FromQuery] string? roleFilter = ""
+            [FromQuery] string? roleFilter = "",
+            [FromQuery] string? cpf = "",
+            [FromQuery] string? email = "",
+            [FromQuery] string? codigoUnico = "",
+            [FromQuery] string? nome = ""
             )
         {
             try
@@ -560,9 +563,20 @@ namespace Auth.Controllers
                         return NoContent(); 
                     }
                 }
-              
+
+                if (!string.IsNullOrEmpty(cpf) || !string.IsNullOrEmpty(email) || !string.IsNullOrEmpty(codigoUnico) || !string.IsNullOrEmpty(nome))
+                {
+                    query = query
+                           .Where(uu =>
+                               (string.IsNullOrEmpty(cpf) || uu.UserAgregado.Cpf.Contains(cpf)) &&
+                               (string.IsNullOrEmpty(email) || uu.UserAgregado.Email.Contains(email)) &&
+                               (string.IsNullOrEmpty(codigoUnico) || uu.UserAgregado.CodigoUnico.Contains(codigoUnico)) &&
+                               (string.IsNullOrEmpty(nome) || uu.UserAgregado.Name.Contains(nome))
+                           );
+                }
 
                 var userxUserRecords = await query
+                    .Include(uu => uu.UserAgregado)
                     .OrderByDescending(x => x.Data_criacao)
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
@@ -572,7 +586,7 @@ namespace Auth.Controllers
 
                 foreach (var userxuser in userxUserRecords)
                 {
-                    var user = await _userManager.FindByIdAsync(userxuser.User_Agregado_Id);
+                    var user = userxuser.UserAgregado;
 
                     if (user != null)
                     {
