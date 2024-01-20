@@ -2,7 +2,7 @@
 @{
     var CustoModal = new CustomModalModel
             {
-                Title = "Esta é uma mensagem de erro dinâmica.",
+                Title = "Editar Edifícios",
                 Content = "teste"
             };
 }
@@ -54,6 +54,7 @@
             <!-- Coluna do Formulário -->
             <div class="col-md-3">
                 <div class="card p-3 shadow">
+                    <button  onclick="openModal()">Abrir</button>
                     <partial name="_CustomModal" model="CustoModal" />
                 </div>
             </div>

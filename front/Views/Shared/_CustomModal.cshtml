@@ -20,16 +20,20 @@
         transition: all 0.3s;
     }
 
-        .modal-window:target {
+        .modal-window.active {
             visibility: visible;
             opacity: 1;
             pointer-events: auto;
+            background-color: rgba(0, 0, 0, 0.5);
         }
 
         .modal-window > div {
-            width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 400px;
             position: absolute;
-            top: 50%;
+            top: 35%;
             left: 50%;
             transform: translate(-50%, -50%);
             padding: 2em;
@@ -38,62 +42,57 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         }
 
+    .modal-header {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: -40px; /* Ajuste para mover para cima */
+        margin-bottom: 20px;
+    }
+
     .modal-close {
-        color: #aaa;
-        line-height: 50px;
-        font-size: 80%;
-        position: absolute;
-        right: 0;
+        color: red;
+        font-size: 150%;
         text-align: center;
-        top: 0;
-        width: 70px;
         text-decoration: none;
+        cursor: pointer;
+
     }
 
         .modal-close:hover {
-            color: black;
+            color: cadetblue;
+
         }
 
-    .modal-title {
-        font-size: 100%;
-        margin: 0 0 15px;
-    }
-
-    .btn_custom_modal {
-        background-color: white;
-        padding: 1em 1.5em;
-        border-radius: 0.5rem;
-        text-decoration: none;
-        display: inline-block;
-        transition: background-color 0.3s ease;
-        cursor: pointer; /* Adicionando cursor pointer para indicar que é clicável */
-    }
-
-        .btn_custom_modal:hover {
-            background-color: #eee;
-        }
+    
 </style>
-
-<div class="container_custom_modal">
-    <div class="interior">
-        <button class="btn_custom_modal" onclick="showModal()">👋 Basic CSS-Only Modal</button>
-    </div>
-</div>
 
 <div id="open-modal" class="modal-window">
     <div>
-        <span class="modal-close" onclick="closeModal()">Close</span>
-        <h5 class="modal-title" id="customModalTitle">@Model.Title</h5>
+        <div class="modal-header">
+            <h5 class="modal-title" id="customModalTitle">@Model.Title</h5>
+            <span class="modal-close" title="fechar" onclick="closeModal()"><i class="bi bi-x-square"></i></span>
+        </div>
         <div id="customModalContent">@Html.Raw(Model.Content)</div>
     </div>
 </div>
 
-<script>
-    function showModal() {
-        window.location.href = "#open-modal";
+<script>  
+  
+    function openModal() {
+        var modal_custom = document.getElementById('open-modal');
+        if (modal_custom) {
+            modal_custom.classList.add('active');
+        }
     }
 
     function closeModal() {
-        window.location.href = "#"; 
+        var modal_custom = document.getElementById('open-modal');
+        if (modal_custom) {
+            modal_custom.classList.remove('active');
+        }
     }
+
+    
 </script>
