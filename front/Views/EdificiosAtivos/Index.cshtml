@@ -1,0 +1,72 @@
+﻿
+@{
+    var CustoModal = new CustomModalModel
+            {
+                Title = "Esta é uma mensagem de erro dinâmica.",
+                Content = "teste"
+            };
+}
+
+<div class="card-body pt-4 p-3 mb-3">
+    <div class="p-3 shadow">
+        <h3>Gerenciar meus Edifícios</h3>
+        <div class="row">
+            <div class="col-md-6">
+                <!-- Coluna dos filtros -->
+                <form class="card-body shadow-sm mb-3" id="filtarForm">
+                    <h5 class="mb-4">Filtros</h5>
+
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="cpf">CPF</label>
+                            <input type="text" class="form-control" id="cpf1" placeholder="Digite o CPF">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="email">Email</label>
+                            <input type="text" class="form-control" id="email1" placeholder="Digite o Email">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="codigoUnico">Código Único</label>
+                            <input type="text" class="form-control" id="codigoUnico1" placeholder="Digite o Código Único">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="nome">Nome</label>
+                            <input type="text" class="form-control" id="nome1" placeholder="Digite o Nome">
+                        </div>                       
+                        <div class="mx-auto d-block text-center gap-2">
+                            <button class="btn btn-primary" style="max-width:100px;" type="button" onclick="chamaFiltro()">
+                                Filtrar
+                                <i class="bi bi-search"></i>
+                            </button>
+                            <button class="btn btn-outline-danger " style="max-width:100px;" type="button" onclick="limpaFiltro()">
+                                Limpar
+                                <i class="bi bi-x-square"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+                <!-- Coluna da Lista de Usuários que sera redenrizada pelo html PARVIEW -->
+                1
+            </div>
+
+
+            <!-- Coluna do Formulário -->
+            <div class="col-md-3">
+                <div class="card p-3 shadow">
+                    <partial name="_CustomModal" model="CustoModal" />
+                </div>
+            </div>
+
+            <!-- Coluna do Associa  -->
+            <div class="col-md-3" id="stickytypeheader">
+                <div class="card p-3 shadow">
+                    3
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+</div>
