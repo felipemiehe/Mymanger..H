@@ -12,6 +12,9 @@ namespace Auth.DTO
 
         public string? Endereco { get; set; }
 
+        [Required(ErrorMessage = "CodigoUnico é obrigatório")]
+        public String CodigoUnico { get; set; }
+
         public int? AtivoId { get; set;}
 
         public int? NumeroAptos { get;  set; }

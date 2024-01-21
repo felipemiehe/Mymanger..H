@@ -7,13 +7,14 @@
 
         }
 
-        public UserxAtivosEdificiosResponseDTO(int Id, string Nome, string Endereco, int? NumeroAptos, string Responsavel_email, int TotalAchados, int TotalPages)
+        public UserxAtivosEdificiosResponseDTO(int Id, string Nome, string Endereco, int? NumeroAptos, List<string> ResponsaveisEmails, string CodigoUnico, int TotalAchados, int TotalPages)
         {
             this.Id = Id;
             this.Nome = Nome;
             this.Endereco = Endereco ?? "sem endereco";
-            this.NumeroAptos = NumeroAptos ?? 0; 
-            this.Responsavel_email = Responsavel_email;
+            this.NumeroAptos = NumeroAptos ?? 0;
+            this.ResponsaveisEmails = ResponsaveisEmails;
+            this.CodigoUnico = CodigoUnico;
             this.TotalAchados = TotalAchados;
             this.TotalPages = TotalPages;
         }
@@ -21,8 +22,9 @@
         public int Id { get; set; }
         public string Nome { get; set; }
         public string Endereco { get; set; }
+        public string CodigoUnico { get; set; }
         public int NumeroAptos { get; set; }      
-        public string Responsavel_email { get; set; }
+        public List<string> ResponsaveisEmails { get; set; }
         public int TotalAchados { get; set; }
         public int TotalPages { get; set; }
     }

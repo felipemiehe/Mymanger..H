@@ -35,7 +35,20 @@ namespace Auth.DbContext
             {
                 entity.HasIndex(e => e.Email).IsUnique();
 
+            });   
+            
+            builder.Entity<Ativo>(entity =>
+            {
+                entity.HasIndex(e => e.CodigoUnico).IsUnique();
+
             });
+
+            builder.Entity<Ativo>(entity =>
+            {
+                entity.HasIndex(e => e.Endereco).IsUnique();
+
+            });
+
 
             builder.Entity<ApplicationUser>(entity =>
             {

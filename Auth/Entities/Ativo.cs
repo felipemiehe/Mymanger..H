@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.InteropServices;
 
@@ -13,12 +14,16 @@ namespace Auth.Entities
         [Required]        
         public string Nome { get; set; }
 
+        [Required]        
+        public string CodigoUnico { get; set; }
+
         public string? Endereco { get; set; }
         // pode ser numero so de referencia como 50 unidades separadas dentro do edificio
         public int? NumeroAptos { get; set; }
 
         [Required]
-        public string Responsavel_email { get; set; }
+        // Change the type to List<ListResponsaveisAtivos>
+        public List<ListResponsaveisAtivos> Responsaveis { get; set; } = new List<ListResponsaveisAtivos>();
 
         // responsavel pelo edificio
         [ForeignKey("Responsavel_email")]

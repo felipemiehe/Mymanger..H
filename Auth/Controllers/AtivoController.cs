@@ -5,10 +5,12 @@ using Auth.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Security.Claims;
+
 
 namespace Auth.Controllers
 {
@@ -36,37 +38,57 @@ namespace Auth.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    Ativo ativo = new Ativo();
-                    ativo.Nome = dto.Nome;
-                    ativo.Endereco = dto.Endereco;
-                    ativo.NumeroAptos = dto.NumeroAptos;
-                    ativo.Responsavel_email = dto.Responsavel_email;
+                    var ativo = new Ativo
+                    {
+                        Nome = dto.Nome,
+                        Endereco = dto.Endereco,
+                        NumeroAptos = dto.NumeroAptos,
+                        CodigoUnico = dto.CodigoUnico
+                    };
 
-                    var check_email =  await _userManager.FindByEmailAsync(dto.Responsavel_email);
+                    // Verifica se o e-mail do responsável existe nos cadastros
+                    var check_email = await _userManager.FindByEmailAsync(dto.Responsavel_email);
 
-                    if (check_email == null) {
+                    if (check_email == null)
+                    {
                         return BadRequest(new ResponseDTO { Status = "Error", Message = "Email tem que existir nos cadastros" });
                     }
 
                     string userId = User.FindFirstValue("userId");
-                    if (userId.Any())
+                    if (!string.IsNullOrEmpty(userId))
                     {
+                        // Verifica se o usuário atual tem permissão para associar o ativo ao responsável
                         var userxUserEntry = await _context.UserxUsers
                             .FirstOrDefaultAsync(u => u.User_Admin_Id == userId && u.User_Agregado_Id == check_email.Id);
+
                         if (userxUserEntry != null)
                         {
+                            // Adiciona o responsável à lista de responsáveis do ativo
+                            ativo.Responsaveis.Add(new ListResponsaveisAtivos
+                            {
+                                email_responsavel = dto.Responsavel_email,
+                                Ativo = ativo
+                            });
+
                             _context.Ativos.Add(ativo);
 
-                            // Associar o Ativo ao usuário que o criou
+                            // Associa o ativo ao usuário que o criou
                             AtivoxUser ativoxUser = new AtivoxUser
                             {
                                 User_id = userId,
                                 Ativo_id = ativo.Id,
                                 Ativo = ativo,
-
                             };
-
                             _context.AtivoxUsers.Add(ativoxUser);
+
+                            // Associa edificio ao resposavel
+                            var ativoxUserEntry = new AtivoxUser
+                            {
+                                User_id = check_email.Id,
+                                Ativo_id = ativo.Id,
+                                Ativo = ativo,
+                            };
+                            _context.AtivoxUsers.Add(ativoxUserEntry);
 
                             // Salva as mudanças no banco de dados
                             await _context.SaveChangesAsync();
@@ -75,13 +97,26 @@ namespace Auth.Controllers
                         }
                     }
                 }
-                
-                return BadRequest(new ResponseDTO { Status = "Error", Message = "Erro na requisição ou usuario não cadastrado" });
+
+                return BadRequest(new ResponseDTO { Status = "Error", Message = $"{dto.Responsavel_email} não cadastrado na sua lista" });
             }
             catch (Exception ex)
             {
+                if (ex.InnerException is SqlException sqlException && sqlException.Number == 2601)
+                {
+                    // Número 2601 é a exceção específica para violação de restrição única no SQL Server
+                    var errorMessage = sqlException.Message;
+
+                    // Extrai o valor duplicado da mensagem de erro
+                    var startIndex = errorMessage.IndexOf("(") + 1;
+                    var endIndex = errorMessage.IndexOf(")");
+                    var valorDuplicado = errorMessage.Substring(startIndex, endIndex - startIndex);
+
+                    return BadRequest(new ResponseDTO { Status = "Error", Message = $"O valor '{valorDuplicado}' já está em uso." });
+                }
+
                 _logger.LogWarning("Erro ao AdicionarAtivo");
-                return StatusCode(500, $"Erro interno do servidor: {ex.Message}");
+                throw;
             }
         }
 
@@ -132,12 +167,12 @@ namespace Auth.Controllers
 
                 var _ativoId = ativo.Id;
                 List<AtivoxUser> novosAtivoxUsers = new List<AtivoxUser>();
+                var userAdminId = User.FindFirstValue("userId");
 
                 foreach (var email in dto.emails)
                 {
                     var user = await _userManager.FindByEmailAsync(email);
-                    var userAdiconarId = user?.Id;
-                    var userAdminId = User.FindFirstValue("userId");
+                    var userAdiconarId = user?.Id;                    
 
                     if (userAdminId != null && userAdiconarId != null)
                     {
@@ -148,31 +183,34 @@ namespace Auth.Controllers
                         AtivoxUser ativoxUserAdicionar = await _context.AtivoxUsers
                             .FirstOrDefaultAsync(au => au.User_id == userAdiconarId && au.Ativo_id == _ativoId);
 
-                        if (ativoxUserAdmin != null && ativoxUserAdicionar == null)
+                        if (ativoxUserAdmin != null )
                         {
-                            novosAtivoxUsers.Add(new AtivoxUser
+                            if(ativoxUserAdicionar == null)
                             {
-                                User_id = userAdiconarId,
-                                Ativo_id = ativo.Id,
-                                Ativo = ativo
-                            });
+                                novosAtivoxUsers.Add(new AtivoxUser
+                                {
+                                    User_id = userAdiconarId,
+                                    Ativo_id = ativo.Id,
+                                    Ativo = ativo
+                                });
+                            }
+                            else
+                            {
+                                novosAtivoxUsers.Clear();
+                                return BadRequest(new ResponseDTO { Status = "Error", Message = $"{email} ja tem vinculo com Edificio {ativoxUserAdicionar.Ativo.Nome}" });
+                            }                        
                         }
                         else
                         {
-                            return NotFound(new ResponseDTO { Status = "Error", Message = "Usuario nao tem acesso a modificações" });
+                            return BadRequest(new ResponseDTO { Status = "Error", Message = "Usuario nao tem acesso a modificações"});
                         }
                     }
                 }
-
-                if(novosAtivoxUsers.Count == 0)
-                {
-                    return NotFound(new ResponseDTO { Status = "Error", Message = "Usuarios não encontrados, Ativo inexistente ou Usuarios ja tem esse ativo" });
-                }
-                               
+                                               
                 _context.AtivoxUsers.AddRange(novosAtivoxUsers);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();                
 
-                return Ok(new ResponseDTO { Status = "Success", Message = "Adicionado com Sucesso" });
+                return Ok(new ResponseDTO { Status = "Success", Message = "Usuarios vinculados com sucesso" });
             }
             catch (Exception ex)
             {
@@ -200,6 +238,7 @@ namespace Auth.Controllers
                 // pegar apenas ativos com Id da requisição
                 var query = _context.Ativos
                     .Include(a => a.AtivoxUsers)
+                    .Include(a => a.Responsaveis)
                     .Where(ativo => ativo.AtivoxUsers.Any(au => au.User_id == userAdminId));               
                 
                 // filtros
@@ -207,7 +246,7 @@ namespace Auth.Controllers
                 {
                     query = query
                            .Where(uu =>
-                               (string.IsNullOrEmpty(emailResponsavel) || uu.Responsavel_email ==  emailResponsavel) &&
+                               (string.IsNullOrEmpty(emailResponsavel) || uu.Responsaveis.Exists(responsavel => responsavel.email_responsavel == emailResponsavel)) &&
                                (string.IsNullOrEmpty(Endereco) || uu.Endereco.Contains(Endereco)) &&
                                (string.IsNullOrEmpty(nome) || uu.Nome.Contains(nome))                             
                            );
@@ -223,15 +262,17 @@ namespace Auth.Controllers
 
                 var ativosXUserList = new List<UserxAtivosEdificiosResponseDTO>();
 
+
                 foreach (var userxAtivo in paginatedUsersxativos)
                 {
-                    
-                        var userXAtivosedficiosDTO = new UserxAtivosEdificiosResponseDTO(
+                    var responsaveisEmails = userxAtivo.Responsaveis.Select(responsavel => responsavel.email_responsavel).ToList();
+                    var userXAtivosedficiosDTO = new UserxAtivosEdificiosResponseDTO(
                             userxAtivo.Id,
                             userxAtivo.Nome,
                             userxAtivo.Endereco,
                             userxAtivo.NumeroAptos,
-                            userxAtivo.Responsavel_email,                            
+                            responsaveisEmails, 
+                            userxAtivo.CodigoUnico,
                             totalRecords,
                             (int)Math.Ceiling((double)totalRecords / pageSize)
                         );
