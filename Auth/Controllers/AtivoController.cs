@@ -36,28 +36,45 @@ namespace Auth.Controllers
                 {
                     Ativo ativo = new Ativo();
                     ativo.Nome = dto.Nome;
+                    ativo.Endereco = dto.Endereco;
+                    ativo.NumeroAptos = dto.NumeroAptos;
+                    ativo.Responsavel_email = dto.Responsavel_email;
+
+                    var check_email =  await _userManager.FindByEmailAsync(dto.Responsavel_email);
+
+                    if (check_email == null) {
+                        return BadRequest(new ResponseDTO { Status = "Error", Message = "Email tem que existir nos cadastros" });
+                    }
 
                     string userId = User.FindFirstValue("userId");
-
-                    _context.Ativos.Add(ativo);
-
-                    // Associar o Ativo ao usuário que o criou
-                    AtivoxUser ativoxUser = new AtivoxUser
+                    if (userId.Any())
                     {
-                        User_id = userId,
-                        Ativo_id = ativo.Id,
-                        Ativo = ativo
-                    };
+                        var userxUserEntry = await _context.UserxUsers
+                            .FirstOrDefaultAsync(u => u.User_Admin_Id == userId && u.User_Agregado_Id == check_email.Id);
+                        if (userxUserEntry != null)
+                        {
+                            _context.Ativos.Add(ativo);
 
-                    _context.AtivoxUsers.Add(ativoxUser);
+                            // Associar o Ativo ao usuário que o criou
+                            AtivoxUser ativoxUser = new AtivoxUser
+                            {
+                                User_id = userId,
+                                Ativo_id = ativo.Id,
+                                Ativo = ativo,
 
-                    // Salva as mudanças no banco de dados
-                    await _context.SaveChangesAsync();
+                            };
 
-                    return Ok(new ResponseDTO { Status = "Success", Message = $"{ativo.Nome}" });
+                            _context.AtivoxUsers.Add(ativoxUser);
+
+                            // Salva as mudanças no banco de dados
+                            await _context.SaveChangesAsync();
+
+                            return Ok(new ResponseDTO { Status = "Success", Message = $"{ativo.Nome}" });
+                        }
+                    }
                 }
                 
-                return BadRequest(ModelState);
+                return BadRequest(new ResponseDTO { Status = "Error", Message = "Erro na requisição ou usuario não cadastrado" });
             }
             catch (Exception ex)
             {
