@@ -1,11 +1,13 @@
 ﻿using Auth.DbContext;
 using Auth.DTO;
+using Auth.DTO.Response;
 using Auth.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 using System.Security.Claims;
 
 namespace Auth.Controllers
@@ -134,22 +136,30 @@ namespace Auth.Controllers
                 foreach (var email in dto.emails)
                 {
                     var user = await _userManager.FindByEmailAsync(email);
-                    var userId = user?.Id;
+                    var userAdiconarId = user?.Id;
+                    var userAdminId = User.FindFirstValue("userId");
 
-                    if (userId != null)
+                    if (userAdminId != null && userAdiconarId != null)
                     {
-                        // Verificar se o usuário atual possui relação com o ativo na tabela Userxativos
-                        AtivoxUser ativoxUser = await _context.AtivoxUsers
-                            .FirstOrDefaultAsync(au => au.User_id == userId && au.Ativo_id == _ativoId);
+                        // Verificar se o usuário admin tem relação com o tabela
+                        AtivoxUser ativoxUserAdmin = await _context.AtivoxUsers
+                            .FirstOrDefaultAsync(au => au.User_id == userAdminId && au.Ativo_id == _ativoId);
+                        // Verificar se o usuário admin tem relação com o tabela
+                        AtivoxUser ativoxUserAdicionar = await _context.AtivoxUsers
+                            .FirstOrDefaultAsync(au => au.User_id == userAdiconarId && au.Ativo_id == _ativoId);
 
-                        if (ativoxUser == null)
+                        if (ativoxUserAdmin != null && ativoxUserAdicionar == null)
                         {
                             novosAtivoxUsers.Add(new AtivoxUser
                             {
-                                User_id = userId,
+                                User_id = userAdiconarId,
                                 Ativo_id = ativo.Id,
                                 Ativo = ativo
                             });
+                        }
+                        else
+                        {
+                            return NotFound(new ResponseDTO { Status = "Error", Message = "Usuario nao tem acesso a modificações" });
                         }
                     }
                 }
@@ -171,7 +181,75 @@ namespace Auth.Controllers
             }
         }
 
-        
+        [HttpGet]
+        [Authorize(Roles = UserRoles.Admin)]
+        [Route("pegarativoxuser")]
+        public async Task<IActionResult> PegarUserxUser(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 5, 
+            [FromQuery] string? emailResponsavel = "",
+            [FromQuery] string? Endereco = "",
+            [FromQuery] string? nome = ""
+            )
+        {
+            try
+            {
+                var userAdminId = User.FindFirstValue("userId");
+
+
+                // pegar apenas ativos com Id da requisição
+                var query = _context.Ativos
+                    .Include(a => a.AtivoxUsers)
+                    .Where(ativo => ativo.AtivoxUsers.Any(au => au.User_id == userAdminId));               
+                
+                // filtros
+                if (!string.IsNullOrEmpty(emailResponsavel) || !string.IsNullOrEmpty(Endereco) || !string.IsNullOrEmpty(nome))
+                {
+                    query = query
+                           .Where(uu =>
+                               (string.IsNullOrEmpty(emailResponsavel) || uu.Responsavel_email ==  emailResponsavel) &&
+                               (string.IsNullOrEmpty(Endereco) || uu.Endereco.Contains(Endereco)) &&
+                               (string.IsNullOrEmpty(nome) || uu.Nome.Contains(nome))                             
+                           );
+                }
+
+                var userxAtivosRecords = await query.ToListAsync();
+                var totalRecords = userxAtivosRecords.Count();
+
+                var paginatedUsersxativos = userxAtivosRecords
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                var ativosXUserList = new List<UserxAtivosEdificiosResponseDTO>();
+
+                foreach (var userxAtivo in paginatedUsersxativos)
+                {
+                    
+                        var userXAtivosedficiosDTO = new UserxAtivosEdificiosResponseDTO(
+                            userxAtivo.Id,
+                            userxAtivo.Nome,
+                            userxAtivo.Endereco,
+                            userxAtivo.NumeroAptos,
+                            userxAtivo.Responsavel_email,                            
+                            totalRecords,
+                            (int)Math.Ceiling((double)totalRecords / pageSize)
+                        );
+
+                       ativosXUserList.Add(userXAtivosedficiosDTO);
+                    
+                }
+
+                return Ok(ativosXUserList);
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning("Erro ao pegarUserxUser");
+                return NotFound(new ResponseDTO { Status = "Error", Message = e.ToString() });
+            }
+        }
+
+
 
     }
 }
