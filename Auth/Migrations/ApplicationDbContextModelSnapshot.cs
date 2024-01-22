@@ -163,9 +163,6 @@ namespace Auth.Migrations
                     b.Property<int>("Ativo_id")
                         .HasColumnType("int");
 
-                    b.Property<int>("Responsavel_email")
-                        .HasColumnType("int");
-
                     b.Property<string>("User_id")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -300,6 +297,10 @@ namespace Auth.Migrations
                     b.Property<int>("Ativo_id")
                         .HasColumnType("int");
 
+                    b.Property<string>("ResponsavelEmailId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("email_responsavel")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -307,6 +308,8 @@ namespace Auth.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Ativo_id");
+
+                    b.HasIndex("ResponsavelEmailId");
 
                     b.ToTable("ListResponsaveisAtivos");
                 });
@@ -598,7 +601,15 @@ namespace Auth.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Auth.Entities.ApplicationUser", "ResponsavelEmail")
+                        .WithMany()
+                        .HasForeignKey("ResponsavelEmailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Ativo");
+
+                    b.Navigation("ResponsavelEmail");
                 });
 
             modelBuilder.Entity("Auth.Entities.UserAdminRolescontrol", b =>

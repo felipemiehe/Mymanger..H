@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Auth.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240121130718_arrumadoentitieidificios")]
-    partial class arrumadoentitieidificios
+    [Migration("20240122172225_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -128,8 +128,12 @@ namespace Auth.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("CodigoUnico")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Endereco")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -138,11 +142,14 @@ namespace Auth.Migrations
                     b.Property<int?>("NumeroAptos")
                         .HasColumnType("int");
 
-                    b.Property<string>("Responsavel_email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CodigoUnico")
+                        .IsUnique();
+
+                    b.HasIndex("Endereco")
+                        .IsUnique()
+                        .HasFilter("[Endereco] IS NOT NULL");
 
                     b.ToTable("Ativos");
                 });
@@ -156,9 +163,6 @@ namespace Auth.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<int>("Ativo_id")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Responsavel_email")
                         .HasColumnType("int");
 
                     b.Property<string>("User_id")
@@ -282,6 +286,34 @@ namespace Auth.Migrations
                     b.HasIndex("Chamado_id");
 
                     b.ToTable("fotoUrls");
+                });
+
+            modelBuilder.Entity("Auth.Entities.ListResponsaveisAtivos", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("Ativo_id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ResponsavelEmailId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("email_responsavel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Ativo_id");
+
+                    b.HasIndex("ResponsavelEmailId");
+
+                    b.ToTable("ListResponsaveisAtivos");
                 });
 
             modelBuilder.Entity("Auth.Entities.UserAdminRolescontrol", b =>
@@ -563,6 +595,25 @@ namespace Auth.Migrations
                     b.Navigation("Chamado");
                 });
 
+            modelBuilder.Entity("Auth.Entities.ListResponsaveisAtivos", b =>
+                {
+                    b.HasOne("Auth.Entities.Ativo", "Ativo")
+                        .WithMany("Responsaveis")
+                        .HasForeignKey("Ativo_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Auth.Entities.ApplicationUser", "ResponsavelEmail")
+                        .WithMany()
+                        .HasForeignKey("ResponsavelEmailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ativo");
+
+                    b.Navigation("ResponsavelEmail");
+                });
+
             modelBuilder.Entity("Auth.Entities.UserAdminRolescontrol", b =>
                 {
                     b.HasOne("Auth.Entities.ApplicationRoles", "Role")
@@ -666,6 +717,8 @@ namespace Auth.Migrations
                     b.Navigation("AtivoxUsers");
 
                     b.Navigation("Chamados");
+
+                    b.Navigation("Responsaveis");
                 });
 
             modelBuilder.Entity("Auth.Entities.Chamado", b =>

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Auth.Migrations
 {
-    public partial class teste : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -60,7 +60,10 @@ namespace Auth.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Nome = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CodigoUnico = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Endereco = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    NumeroAptos = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -294,6 +297,33 @@ namespace Auth.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ListResponsaveisAtivos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    email_responsavel = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Ativo_id = table.Column<int>(type: "int", nullable: false),
+                    ResponsavelEmailId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ListResponsaveisAtivos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ListResponsaveisAtivos_AspNetUsers_ResponsavelEmailId",
+                        column: x => x.ResponsavelEmailId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ListResponsaveisAtivos_Ativos_Ativo_id",
+                        column: x => x.Ativo_id,
+                        principalTable: "Ativos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DataPauses",
                 columns: table => new
                 {
@@ -416,6 +446,19 @@ namespace Auth.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Ativos_CodigoUnico",
+                table: "Ativos",
+                column: "CodigoUnico",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ativos_Endereco",
+                table: "Ativos",
+                column: "Endereco",
+                unique: true,
+                filter: "[Endereco] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AtivoxUsers_Ativo_id",
                 table: "AtivoxUsers",
                 column: "Ativo_id");
@@ -454,6 +497,16 @@ namespace Auth.Migrations
                 name: "IX_fotoUrls_Chamado_id",
                 table: "fotoUrls",
                 column: "Chamado_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ListResponsaveisAtivos_Ativo_id",
+                table: "ListResponsaveisAtivos",
+                column: "Ativo_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ListResponsaveisAtivos_ResponsavelEmailId",
+                table: "ListResponsaveisAtivos",
+                column: "ResponsavelEmailId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserAdminRolescontrols_RoleId",
@@ -501,6 +554,9 @@ namespace Auth.Migrations
 
             migrationBuilder.DropTable(
                 name: "fotoUrls");
+
+            migrationBuilder.DropTable(
+                name: "ListResponsaveisAtivos");
 
             migrationBuilder.DropTable(
                 name: "UserAdminRolescontrols");

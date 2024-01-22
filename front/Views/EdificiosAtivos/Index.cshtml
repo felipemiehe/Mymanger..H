@@ -1,4 +1,6 @@
-﻿
+﻿@model List<front.Models.EdifioxUserModel>
+@using Auth.Entities
+
 @{
     var CustoModal = new CustomModalModel
             {
@@ -47,7 +49,8 @@
                     </div>
                 </form>
                 <!-- Coluna da Lista de Usuários que sera redenrizada pelo html PARVIEW -->
-                1
+                <partial name="_EdificioxUserPartial" model="Model" />
+                
             </div>
 
 

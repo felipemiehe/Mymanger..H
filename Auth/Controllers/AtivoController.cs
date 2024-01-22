@@ -61,13 +61,16 @@ namespace Auth.Controllers
                         var userxUserEntry = await _context.UserxUsers
                             .FirstOrDefaultAsync(u => u.User_Admin_Id == userId && u.User_Agregado_Id == check_email.Id);
 
+                        var responsavel = await _userManager.FindByEmailAsync(dto.Responsavel_email);
+
                         if (userxUserEntry != null)
                         {
                             // Adiciona o responsável à lista de responsáveis do ativo
                             ativo.Responsaveis.Add(new ListResponsaveisAtivos
                             {
-                                email_responsavel = dto.Responsavel_email,
-                                Ativo = ativo
+                                email_responsavel = dto.Responsavel_email,                                
+                                Ativo = ativo,
+                                ResponsavelEmail = responsavel
                             });
 
                             _context.Ativos.Add(ativo);
@@ -222,7 +225,7 @@ namespace Auth.Controllers
         [HttpGet]
         [Authorize(Roles = UserRoles.Admin)]
         [Route("pegarativoxuser")]
-        public async Task<IActionResult> PegarUserxUser(
+        public async Task<IActionResult> pegarativoxuser(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 5, 
             [FromQuery] string? emailResponsavel = "",
@@ -239,17 +242,21 @@ namespace Auth.Controllers
                 var query = _context.Ativos
                     .Include(a => a.AtivoxUsers)
                     .Include(a => a.Responsaveis)
-                    .Where(ativo => ativo.AtivoxUsers.Any(au => au.User_id == userAdminId));               
-                
+                        .ThenInclude(r => r.ResponsavelEmail)
+                    .Where(ativo => ativo.AtivoxUsers.Any(au => au.User_id == userAdminId));
+
                 // filtros
                 if (!string.IsNullOrEmpty(emailResponsavel) || !string.IsNullOrEmpty(Endereco) || !string.IsNullOrEmpty(nome))
                 {
                     query = query
-                           .Where(uu =>
-                               (string.IsNullOrEmpty(emailResponsavel) || uu.Responsaveis.Exists(responsavel => responsavel.email_responsavel == emailResponsavel)) &&
-                               (string.IsNullOrEmpty(Endereco) || uu.Endereco.Contains(Endereco)) &&
-                               (string.IsNullOrEmpty(nome) || uu.Nome.Contains(nome))                             
-                           );
+                        .Include(uu => uu.Responsaveis.Select(responsavel => responsavel.ResponsavelEmail))
+                        .Where(uu =>
+                            (string.IsNullOrEmpty(emailResponsavel) || uu.Responsaveis.Any(responsavel =>
+                                 responsavel.email_responsavel == emailResponsavel &&                                 
+                                 responsavel.ResponsavelEmail.IsActive)) &&
+                            (string.IsNullOrEmpty(Endereco) || uu.Endereco.Contains(Endereco)) &&
+                            (string.IsNullOrEmpty(nome) || uu.Nome.Contains(nome))
+                        );
                 }
 
                 var userxAtivosRecords = await query.ToListAsync();
@@ -265,7 +272,13 @@ namespace Auth.Controllers
 
                 foreach (var userxAtivo in paginatedUsersxativos)
                 {
-                    var responsaveisEmails = userxAtivo.Responsaveis.Select(responsavel => responsavel.email_responsavel).ToList();
+                    var responsaveisEmails = userxAtivo.Responsaveis != null
+                            ? userxAtivo.Responsaveis
+                                .Where(responsavel => responsavel.ResponsavelEmail != null && responsavel.ResponsavelEmail.IsActive)
+                                .Select(responsavel => responsavel.email_responsavel)
+                                .ToList()
+                            : new List<string>();
+
                     var userXAtivosedficiosDTO = new UserxAtivosEdificiosResponseDTO(
                             userxAtivo.Id,
                             userxAtivo.Nome,

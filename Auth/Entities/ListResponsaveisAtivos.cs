@@ -16,6 +16,8 @@ namespace Auth.Entities
 
         [ForeignKey("Ativo_id")]
         public Ativo Ativo { get; set; }
+        
+        public ApplicationUser ResponsavelEmail{ get; set; }
 
 
     }

@@ -14,7 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\EdificiosAtivos\_EdficiosxUserPartial.cshtml.cs" />
     <Compile Remove="Views\UserxUser\_AssociaRolesPartial.cshtml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Views\EdificiosAtivos\_EdficiosxUserPartial.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

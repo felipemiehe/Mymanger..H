@@ -21,14 +21,10 @@ namespace Auth.Entities
         // pode ser numero so de referencia como 50 unidades separadas dentro do edificio
         public int? NumeroAptos { get; set; }
 
-        [Required]
-        // Change the type to List<ListResponsaveisAtivos>
+        [Required]        
         public List<ListResponsaveisAtivos> Responsaveis { get; set; } = new List<ListResponsaveisAtivos>();
 
-        // responsavel pelo edificio
-        [ForeignKey("Responsavel_email")]
-
-
+        
         // Propriedade de navegação para representar o relacionamento
         public ICollection<AtivoxUser> AtivoxUsers { get; set; } = new List<AtivoxUser>();
         public ICollection<Chamado> Chamados { get; set; } = new List<Chamado>();
