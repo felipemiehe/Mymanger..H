@@ -230,7 +230,8 @@ namespace Auth.Controllers
             [FromQuery] int pageSize = 5, 
             [FromQuery] string? emailResponsavel = "",
             [FromQuery] string? Endereco = "",
-            [FromQuery] string? nome = ""
+            [FromQuery] string? nome = "",
+            [FromQuery] string? CodUnico = ""
             )
         {
             try
@@ -245,15 +246,14 @@ namespace Auth.Controllers
                         .ThenInclude(r => r.ResponsavelEmail)
                     .Where(ativo => ativo.AtivoxUsers.Any(au => au.User_id == userAdminId));
 
-                // filtros
-                if (!string.IsNullOrEmpty(emailResponsavel) || !string.IsNullOrEmpty(Endereco) || !string.IsNullOrEmpty(nome))
+                // Filtros
+                if (!string.IsNullOrEmpty(emailResponsavel) || !string.IsNullOrEmpty(Endereco) || !string.IsNullOrEmpty(nome) || !string.IsNullOrEmpty(CodUnico))
                 {
                     query = query
-                        .Include(uu => uu.Responsaveis.Select(responsavel => responsavel.ResponsavelEmail))
                         .Where(uu =>
                             (string.IsNullOrEmpty(emailResponsavel) || uu.Responsaveis.Any(responsavel =>
-                                 responsavel.email_responsavel == emailResponsavel &&                                 
-                                 responsavel.ResponsavelEmail.IsActive)) &&
+                                 responsavel.ResponsavelEmail.Email == emailResponsavel)) &&
+                            (string.IsNullOrEmpty(CodUnico) || uu.CodigoUnico.Contains(CodUnico)) &&
                             (string.IsNullOrEmpty(Endereco) || uu.Endereco.Contains(Endereco)) &&
                             (string.IsNullOrEmpty(nome) || uu.Nome.Contains(nome))
                         );
@@ -267,32 +267,19 @@ namespace Auth.Controllers
                     .Take(pageSize)
                     .ToList();
 
-                var ativosXUserList = new List<UserxAtivosEdificiosResponseDTO>();
-
-
-                foreach (var userxAtivo in paginatedUsersxativos)
-                {
-                    var responsaveisEmails = userxAtivo.Responsaveis != null
-                            ? userxAtivo.Responsaveis
-                                .Where(responsavel => responsavel.ResponsavelEmail != null && responsavel.ResponsavelEmail.IsActive)
-                                .Select(responsavel => responsavel.email_responsavel)
-                                .ToList()
-                            : new List<string>();
-
-                    var userXAtivosedficiosDTO = new UserxAtivosEdificiosResponseDTO(
-                            userxAtivo.Id,
-                            userxAtivo.Nome,
-                            userxAtivo.Endereco,
-                            userxAtivo.NumeroAptos,
-                            responsaveisEmails, 
-                            userxAtivo.CodigoUnico,
-                            totalRecords,
-                            (int)Math.Ceiling((double)totalRecords / pageSize)
-                        );
-
-                       ativosXUserList.Add(userXAtivosedficiosDTO);
-                    
-                }
+                var ativosXUserList = paginatedUsersxativos.Select(userxAtivo => new UserxAtivosEdificiosResponseDTO(
+                    userxAtivo.Id,
+                    userxAtivo.Nome,
+                    userxAtivo.Endereco,
+                    userxAtivo.NumeroAptos,
+                    userxAtivo.Responsaveis
+                        .Where(responsavel => responsavel.ResponsavelEmail != null && responsavel.ResponsavelEmail.IsActive)
+                        .Select(responsavel => responsavel.email_responsavel)
+                        .ToList(),
+                    userxAtivo.CodigoUnico,
+                    totalRecords,
+                    (int)Math.Ceiling((double)totalRecords / pageSize)
+                )).ToList();
 
                 return Ok(ativosXUserList);
             }

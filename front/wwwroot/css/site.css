@@ -86,5 +86,8 @@ html {
         transform: rotate(180deg);
     }
 
-
+.copy-icon:hover {
+    color: #007bff;
+    cursor: pointer;
+} 
 

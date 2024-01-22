@@ -59,3 +59,18 @@ toastr.options = {
     "hideMethod": "fadeOut"
 }
 
+
+function copiarElemento(elemento) {
+    var inputElement = document.createElement('input');
+    inputElement.value = elemento;
+
+    document.body.appendChild(inputElement);
+    inputElement.select();
+    inputElement.setSelectionRange(0, 99999);
+    document.execCommand('copy');
+    document.body.removeChild(inputElement);
+
+    // Exibe alguma notificação
+    showSuccessNotification('copiado!');
+}
+

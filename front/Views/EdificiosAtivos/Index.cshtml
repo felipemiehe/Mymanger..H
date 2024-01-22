@@ -20,27 +20,27 @@
 
                     <div class="row">
                         <div class="col-md-3 mb-3">
-                            <label for="cpf">CPF</label>
-                            <input type="text" class="form-control" id="cpf1" placeholder="Digite o CPF">
+                            <label for="Nome">Nome</label>
+                            <input type="text" class="form-control" id="Nome12" placeholder="Digite o Nome">
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label for="email">Email</label>
-                            <input type="text" class="form-control" id="email1" placeholder="Digite o Email">
+                            <label for="Endereco">Endereço</label>
+                            <input type="text" class="form-control" id="Endereco12" placeholder="Digite o Endereço">
                         </div>
                         <div class="col-md-3 mb-3">
                             <label for="codigoUnico">Código Único</label>
-                            <input type="text" class="form-control" id="codigoUnico1" placeholder="Digite o Código Único">
+                            <input type="text" class="form-control" id="codigoUnico12" placeholder="Digite o Código Único">
                         </div>
                         <div class="col-md-3 mb-3">
-                            <label for="nome">Nome</label>
-                            <input type="text" class="form-control" id="nome1" placeholder="Digite o Nome">
+                            <label for="emailResponsavel">email do Responsavel</label>
+                            <input type="text" class="form-control" id="emailResponsavel12" placeholder="email do Responsavel">
                         </div>                       
                         <div class="mx-auto d-block text-center gap-2">
-                            <button class="btn btn-primary" style="max-width:100px;" type="button" onclick="chamaFiltro()">
+                            <button class="btn btn-primary" style="max-width:100px;" type="button" onclick="filtrarEdificios()">
                                 Filtrar
                                 <i class="bi bi-search"></i>
                             </button>
-                            <button class="btn btn-outline-danger " style="max-width:100px;" type="button" onclick="limpaFiltro()">
+                            <button class="btn btn-outline-danger " style="max-width:100px;" type="button" onclick="limpaFiltroEdificios()">
                                 Limpar
                                 <i class="bi bi-x-square"></i>
                             </button>
@@ -74,3 +74,43 @@
         </div>
     </div>
 </div>
+
+<script>
+
+    // Função para filtrar Edificios
+    function filtrarEdificios() {        
+            var page = 1;
+            var Endereco = $("#Endereco12").val();
+            var emailResponsavel = $("#emailResponsavel12").val();
+            var CodUnico = $("#codigoUnico12").val();
+            var nome = $("#Nome12").val();
+
+            $.ajax({
+                url: '@Url.Action("GetEdificioList", "EdificiosAtivos")',
+                type: 'GET',
+                data: {
+                    page: page,
+                    emailResponsavel: emailResponsavel,
+                    Endereco: Endereco,
+                    nome: nome,
+                    CodUnico: CodUnico 
+                },
+                success: function (data) {
+                    $("#EDIFICIOSXUSER").html(data);  
+                },
+                error: function (error) {
+                    showWarningNotification('Não foi possível filtrar');
+                    reject(error);
+                }
+            });        
+    }
+
+    function limpaFiltroEdificios() {
+        $("#emailResponsavel12").val("");
+        $("#Endereco12").val("");
+        $("#codigoUnico12").val("");
+        $("#Nome12").val("");
+        filtrarEdificios()            
+    }
+
+</script>

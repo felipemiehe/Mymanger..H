@@ -31,13 +31,7 @@
     .list-group-item:hover {
         transform: scale(1.02);
         transition: transform 0.3s ease;
-    }
-
-    
-    .copy-icon:hover {
-        color: #007bff; 
-        cursor: pointer;
-    }       
+    }         
 
 </style>
 
@@ -110,7 +104,7 @@ else
                                 <span>Nome: @Html.DisplayFor(modelItem => item.Nome)</span>
                                 <span title="@item.CodigoUnico">
                                     Código: @Html.DisplayFor(modelItem => item.CodigoUnicoExibicao)
-                                    <i title="Copiar Codigo" class="bi bi-clipboard copy-icon" onclick="copiarCodigoUnico('@item.CodigoUnico')"></i>
+                                    <i title="Copiar Codigo" class="bi bi-clipboard copy-icon" onclick="copiarElemento('@item.CodigoUnico')"></i>
                                 </span>
                             </strong>
                         </h6>
@@ -239,22 +233,7 @@ else
                 showErrorNotification('Erro na requisição');
             }
         });
-    }
-   
-
-    function copiarCodigoUnico(codigoUnico) {        
-        var inputElement = document.createElement('input');
-        inputElement.value = codigoUnico;
-       
-        document.body.appendChild(inputElement);        
-        inputElement.select();
-        inputElement.setSelectionRange(0, 99999); 
-        document.execCommand('copy');
-        document.body.removeChild(inputElement);
-
-        // Exibe alguma notificação
-        showSuccessNotification('Código unico copiado!');
-    }
+    } 
 
     function deletaUser(email){
         $.ajax({
