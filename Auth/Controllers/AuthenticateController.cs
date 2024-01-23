@@ -699,6 +699,12 @@ namespace Auth.Controllers
                     return NotFound("Usuário não encontrado");
                 }
 
+                var userAdminId = User.FindFirstValue("userId");
+
+                var userxUserAssociation = await _context.UserxUsers
+                       .FirstOrDefaultAsync(u => u.User_Admin_Id == userAdminId && u.User_Agregado_Id == user.Id);
+
+
                 var errorMessages = new List<string>();
 
                 var existingUserWithSameEmail = await _context.Users
@@ -751,25 +757,36 @@ namespace Auth.Controllers
         [Route("getuserbycodigounico/{codUnico}")]
         public async Task<IActionResult> GetUserByCodigoUnico([FromRoute][Required] string codUnico)
         {
+            var userAdminId = User.FindFirstValue("userId");
+
             var userAchado = await _context.Users
                     .FirstOrDefaultAsync(u => u.CodigoUnico == codUnico);
 
-            if (userAchado != null)
+            if(userAchado != null)
             {
-                UserFindForEditResponseDTO userEnviar = new UserFindForEditResponseDTO();
+                var userxUserAssociation = await _context.UserxUsers
+                       .FirstOrDefaultAsync(u => u.User_Admin_Id == userAdminId && u.User_Agregado_Id == userAchado.Id);
 
-                userEnviar.PhoneNumber = userAchado.PhoneNumber;
-                userEnviar.Cpf = userAchado.Cpf;
-                userEnviar.Name = userAchado.Name;
-                userEnviar.Email = userAchado.Email;                
-                userEnviar.CodigoUnico = userAchado.CodigoUnico;                
+                if (userxUserAssociation != null)
+                {
+                    UserFindForEditResponseDTO userEnviar = new UserFindForEditResponseDTO();
 
-                return Ok(userEnviar);
+                    userEnviar.PhoneNumber = userAchado.PhoneNumber;
+                    userEnviar.Cpf = userAchado.Cpf;
+                    userEnviar.Name = userAchado.Name;
+                    userEnviar.Email = userAchado.Email;
+                    userEnviar.CodigoUnico = userAchado.CodigoUnico;
+
+                    return Ok(userEnviar);
+                }
+                else
+                {
+                    return NotFound();
+                }
+
             }
-            else
-            {
-                return NotFound();
-            }
+
+            return NotFound();
 
         }
 

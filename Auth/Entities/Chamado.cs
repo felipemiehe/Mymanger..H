@@ -10,6 +10,7 @@ namespace Auth.Entities
         [Required] public string? Descricao { get; set; }
         public ICollection<FotoUrl> Foto_URLs { get; set; } = new List<FotoUrl>();
         public bool Finalizado { get; set; }
+        public bool Criado { get; set; }
         public bool Executando { get; set; }
         public DateTime Data_criacao { get; set; } = DateTime.Now;
         public DateTime? Data_finalizacao { get; set; }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 
@@ -288,6 +289,106 @@ namespace Auth.Controllers
                 _logger.LogWarning("Erro ao pegarUserxUser");
                 return NotFound(new ResponseDTO { Status = "Error", Message = e.ToString() });
             }
+        }
+
+
+        [HttpGet]
+        [Authorize(Roles = UserRoles.Admin)]
+        [Route("getedificiosbycodigounico/{codUnico}")]
+        public async Task<IActionResult> GetEdificiosByCodigoUnico([FromRoute][Required] string codUnico)
+        {
+
+            var userAdminId = User.FindFirstValue("userId");
+
+            var ativoAchado = await _context.Ativos
+                    .FirstOrDefaultAsync(u => u.CodigoUnico == codUnico);
+
+            if (ativoAchado != null)
+            {
+                var userxUserAssociation = await _context.AtivoxUsers
+                        .FirstOrDefaultAsync(u => u.User_id == userAdminId && u.Ativo_id == ativoAchado.Id);
+                if (userxUserAssociation != null)
+                {
+                    EdificioFindForEditResponseDTO edificioEnviar = new EdificioFindForEditResponseDTO();
+
+                    return Ok(new EdificioFindForEditResponseDTO(ativoAchado.Endereco, ativoAchado.Nome, ativoAchado.CodigoUnico));
+                }
+                else
+                {
+                    return NotFound();
+                }
+
+            }
+
+            return NotFound();
+
+        }
+
+        [HttpPut]
+        [Authorize(Roles = UserRoles.Admin)]
+        [Route("autualizaedificios")]
+        public async Task<IActionResult> autualizaEdificios([FromBody] AtualizaEdficiosDTO dto)
+        {
+            try
+            {
+                var edificio = await _context.Ativos.FirstOrDefaultAsync(u => u.CodigoUnico == dto.CodigoUnico);
+
+                if (edificio == null)
+                {
+                    return NotFound("Edificio não encontrado");
+                }
+
+                var userAdminId = User.FindFirstValue("userId");
+
+                var checkResult = await CheckRelationAtivoxUsers(userAdminId, edificio.Id);
+                if (checkResult) 
+                    return BadRequest(new ResponseDTO { Status = "error", Message = $"sem permisão para alterar o {edificio.Nome}"});
+
+                if (!edificio.Equals(dto))
+                {                    
+                    _context.Entry(edificio).CurrentValues.SetValues(dto);                    
+                    await _context.SaveChangesAsync();
+                    return Ok(new EdificioFindForEditResponseDTO(edificio.Endereco,edificio.Nome,edificio.CodigoUnico));
+                }
+
+                return BadRequest(new ResponseDTO { Status = "error", Message = $"Error ao alterar o {edificio.Nome}" });
+            }
+            catch (Exception ex)
+            {
+               return CheckSqlNumber2061(ex, "autualizaEdificios");                 
+               throw;
+            }
+        }
+
+
+        private async Task<bool> CheckRelationAtivoxUsers(String idRequisição, int IdEdificio)
+        {
+            var userxUserAssociation = await _context.AtivoxUsers
+                       .FirstOrDefaultAsync(u => u.User_id == idRequisição && u.Ativo_id == IdEdificio);            
+            if(userxUserAssociation == null)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private IActionResult CheckSqlNumber2061(Exception ex, string NomeController)
+        {
+            if (ex.InnerException is SqlException sqlException && sqlException.Number == 2601)
+            {
+                // Número 2601 é a exceção específica para violação de restrição única no SQL Server
+                var errorMessage = sqlException.Message;
+
+                // Extrai o valor duplicado da mensagem de erro
+                var startIndex = errorMessage.IndexOf("(") + 1;
+                var endIndex = errorMessage.IndexOf(")");
+                var valorDuplicado = errorMessage.Substring(startIndex, endIndex - startIndex);
+
+                return BadRequest(new ResponseDTO { Status = "Error", Message = $"O valor '{valorDuplicado}' já está em uso." });
+            }
+            _logger.LogWarning($"Erro ao {NomeController}");
+            return StatusCode(500, new ResponseDTO { Status = "Error", Message = "Erro inesperado" });
         }
 
 
