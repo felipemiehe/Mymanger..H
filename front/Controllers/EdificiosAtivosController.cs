@@ -37,13 +37,13 @@ namespace front.Controllers
         {
             List<EdifioxUserModel> edificioList = ObterListaEdificiosXUser(page, pageSize, emailResponsavel, Endereco, nome);
 
-            if (edificioList != null)
+            if (edificioList != null && edificioList.Count() >= 1)
             {
                 return View(edificioList);
             }
             else
             {
-                return View(new List<EdifioxUserModel>());
+                return View(ObterListaEdificiosXUser(1, 5));
             }
         }
 
