@@ -68,7 +68,7 @@ namespace Auth.Controllers
                             // Adiciona o responsável à lista de responsáveis do ativo
                             ativo.Responsaveis.Add(new ListResponsaveisAtivos
                             {
-                                email_responsavel = dto.Responsavel_email,                                
+                                email_responsavel_criado = dto.Responsavel_email,                                
                                 Ativo = ativo,
                                 ResponsavelEmail = responsavel
                             });
@@ -274,7 +274,7 @@ namespace Auth.Controllers
                     userxAtivo.NumeroAptos,
                     userxAtivo.Responsaveis
                         .Where(responsavel => responsavel.ResponsavelEmail != null && responsavel.ResponsavelEmail.IsActive)
-                        .Select(responsavel => responsavel.email_responsavel)
+                        .Select(responsavel => responsavel.ResponsavelEmail.Email)
                         .ToList(),
                     userxAtivo.CodigoUnico,
                     totalRecords,

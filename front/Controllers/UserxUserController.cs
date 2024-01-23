@@ -46,13 +46,13 @@ namespace front.Controllers
         {
             List<UserXUserViewModel> userList = ObterListaUserXUser(page, pageSize, roleFIlter, cpf, email, codigoUnico, nome);
 
-            if (userList != null)
+            if (userList != null && userList.Count() >= 1)
             {                
                 return View(userList);
             }
             else
             {                
-                return View(new List<UserXUserViewModel>());
+                return View(ObterListaUserXUser(1, 5));
             }
         }
 

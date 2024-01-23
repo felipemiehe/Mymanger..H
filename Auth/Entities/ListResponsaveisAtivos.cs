@@ -9,7 +9,7 @@ namespace Auth.Entities
         public int Id { get; set; }
 
         [Required]
-        public string email_responsavel { get; set; }
+        public string email_responsavel_criado { get; set; }
 
         [Required]
         public int Ativo_id { get; set; }
