@@ -3,6 +3,6 @@
     public class CustomModalModel
     {
         public string? Title { get; set; }
-        public string? Content { get; set; }
+        public string? Id { get; set; }
     }
 }

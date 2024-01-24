@@ -73,5 +73,20 @@ namespace front.Controllers
             return Json(new { success = false, message = "erro ao excluir!" });
 
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> getEdificioByCodUnico(string codigounico)
+        {
+
+            HttpClient configuredClient = new ClienteComCookie(Request).ConfiguredClient;
+            HttpResponseMessage response = configuredClient.GetAsync(configuredClient.BaseAddress + $"api/ativo/getedificiosbycodigounico/{codigounico}").Result;
+
+
+            string userJson = await response.Content.ReadAsStringAsync();
+            AtualizaEdificiosModel userModel = JsonConvert.DeserializeObject<AtualizaEdificiosModel>(userJson);
+
+            return PartialView("_EdficioAtualizarPartial", userModel);
+        }
     }
 }

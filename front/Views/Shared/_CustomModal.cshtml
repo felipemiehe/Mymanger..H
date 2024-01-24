@@ -74,7 +74,8 @@
             <h5 class="modal-title" id="customModalTitle">@Model.Title</h5>
             <span class="modal-close" title="fechar" onclick="closeModal()"><i class="bi bi-x-square"></i></span>
         </div>
-        <div id="customModalContent">@Html.Raw(Model.Content)</div>
+        @* content *@
+        <div id="@Model.Id"></div>
     </div>
 </div>
 
