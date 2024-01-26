@@ -49,6 +49,19 @@
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
 
+        <div class="form-group mb-1">
+            <label asp-for="Funcao" class="control-label">Escolha uma função:</label>
+            <select asp-for="Funcao" class="form-control" id="RoleNameAssociaRolesModel">
+                <option value="">Selecione uma função</option>
+                <option value="@UserRoles.TecnicoGeral">Técnico Geral</option>
+                <option value="@UserRoles.Fiscais">Fiscais</option>
+                <option value="@UserRoles.Reporter">Reporter</option>
+                <option value="@UserRoles.TecnicoHidraulica">Técnico Hidráulica</option>
+                <option value="@UserRoles.TecnicoEletrica">Técnico Eletrica</option>
+            </select>
+            <span asp-validation-for="Funcao" class="text-danger"></span>
+        </div>
+
         <button type="submit" class="btn btn-outline-primary gap-1 d-flex align-items-center">
             Adicionar Usuário
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">

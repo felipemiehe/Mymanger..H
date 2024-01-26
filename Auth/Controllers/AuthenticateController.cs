@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Data.SqlTypes;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Linq.Expressions;
@@ -186,6 +187,12 @@ namespace Auth.Controllers
           
             try
             {
+                if(dto.Funcao != null)
+                if (!UserRoles.ContainsRole(dto.Funcao))
+                {
+                    return BadRequest(new ResponseDTO { Status = "Error", Message = $"Uma função é requerida" });
+                }
+
                 ApplicationUser user = new()
                 {
                     Email = dto.Email,
@@ -210,6 +217,9 @@ namespace Auth.Controllers
                 if (await _roleManager.RoleExistsAsync(UserRoles.User))
                 {
                     await _userManager.AddToRoleAsync(user, UserRoles.User);
+                    if (await _roleManager.RoleExistsAsync(dto.Funcao))
+                        await _userManager.AddToRoleAsync(user, dto.Funcao);
+
                 }
 
                 UserxUser uxu = new()
