@@ -24,7 +24,7 @@ namespace Auth.DTO
         [Required(ErrorMessage = "CodigoUnico is required")]
         public string? CodigoUnico { get; set; } 
 
-        [Required(ErrorMessage = "Função inicial is required")]
+        [Required(ErrorMessage = "Função is required")]
         public string? Funcao { get; set; }
 
 
