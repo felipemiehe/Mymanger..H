@@ -128,26 +128,7 @@ else
 
 
 
-<script>
-
-   @*  function refreshEdficiosList() {
-        return new Promise(function (resolve, reject) {
-            var page = new URLSearchParams(window.location.search).get('page') || 1;
-            $.ajax({
-                url: '@Url.Action("GetEdificioList", "EdificiosAtivos")',
-                type: 'GET',
-                data: { page: page },
-                success: function (data) {
-                    $("#EDIFICIOSXUSER").html(data);
-                    resolve();  
-                },
-                error: function (error) {
-                    showWarningNotification('Usuários não foram carregados corretamente');
-                    reject(error);
-                }
-            });
-        });
-    } *@
+<script> 
 
     function deletaEdificio(id) {
         $.ajax({
