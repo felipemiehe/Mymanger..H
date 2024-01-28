@@ -69,7 +69,7 @@ namespace Auth.Controllers
                             // Adiciona o responsável à lista de responsáveis do ativo
                             ativo.Responsaveis.Add(new ListResponsaveisAtivos
                             {
-                                email_responsavel_criado = dto.Responsavel_email,                                
+                                email_responsavel_criado = dto.Responsavel_email,
                                 Ativo = ativo,
                                 ResponsavelEmail = responsavel
                             });
@@ -125,7 +125,7 @@ namespace Auth.Controllers
         }
 
         [HttpDelete("{ativoId}")]
-        [Authorize(Roles = $"{UserRoles.Admin}")]        
+        [Authorize(Roles = $"{UserRoles.Admin}")]
         public async Task<IActionResult> deletarAtivo(int ativoId)
         {
 
@@ -136,7 +136,7 @@ namespace Auth.Controllers
 
                 // Verificar se o usuário atual possui relação com o ativo na tabela Userxativos
                 AtivoxUser ativoxUser = await _context.AtivoxUsers
-                    .FirstOrDefaultAsync(au => au.User_id == userId && au.Ativo_id == ativoId);                               
+                    .FirstOrDefaultAsync(au => au.User_id == userId && au.Ativo_id == ativoId);
 
                 if (ativo == null || ativoxUser == null)
                 {
@@ -176,7 +176,7 @@ namespace Auth.Controllers
                 foreach (var email in dto.emails)
                 {
                     var user = await _userManager.FindByEmailAsync(email);
-                    var userAdiconarId = user?.Id;                    
+                    var userAdiconarId = user?.Id;
 
                     if (userAdminId != null && userAdiconarId != null)
                     {
@@ -187,9 +187,9 @@ namespace Auth.Controllers
                         AtivoxUser ativoxUserAdicionar = await _context.AtivoxUsers
                             .FirstOrDefaultAsync(au => au.User_id == userAdiconarId && au.Ativo_id == _ativoId);
 
-                        if (ativoxUserAdmin != null )
+                        if (ativoxUserAdmin != null)
                         {
-                            if(ativoxUserAdicionar == null)
+                            if (ativoxUserAdicionar == null)
                             {
                                 novosAtivoxUsers.Add(new AtivoxUser
                                 {
@@ -202,17 +202,17 @@ namespace Auth.Controllers
                             {
                                 novosAtivoxUsers.Clear();
                                 return BadRequest(new ResponseDTO { Status = "Error", Message = $"{email} ja tem vinculo com Edificio {ativoxUserAdicionar.Ativo.Nome}" });
-                            }                        
+                            }
                         }
                         else
                         {
-                            return BadRequest(new ResponseDTO { Status = "Error", Message = "Usuario nao tem acesso a modificações"});
+                            return BadRequest(new ResponseDTO { Status = "Error", Message = "Usuario nao tem acesso a modificações" });
                         }
                     }
                 }
-                                               
+
                 _context.AtivoxUsers.AddRange(novosAtivoxUsers);
-                await _context.SaveChangesAsync();                
+                await _context.SaveChangesAsync();
 
                 return Ok(new ResponseDTO { Status = "Success", Message = "Usuarios vinculados com sucesso" });
             }
@@ -224,7 +224,7 @@ namespace Auth.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = UserRoles.Admin)]
+        [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.Fiscais}")]
         [Route("pegarativoxuser")]
         public async Task<IActionResult> pegarativoxuser(
             [FromQuery] int page = 1,

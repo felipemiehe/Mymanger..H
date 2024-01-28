@@ -93,8 +93,7 @@ else
                                 foreach (var email in item.ResponsaveisEmails)
                                 {
                                     <a title="Editar" href="@Url.Action("Index", "UserxUser", new { email = email })" class="text-dark ms-sm-2 font-weight-bold text-decoration-none">
-                                        <strong>@email</strong>
-                                        <i class="bi bi-pencil-square"></i>
+                                        <strong class="copy-icon">@email <i class="bi bi-pencil-square"></i></strong>                                        
                                     </a>
                                 }
                             }
