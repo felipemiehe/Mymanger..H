@@ -20,14 +20,27 @@
     </div>
 
     <div class="form-group mb-1">
-        <label asp-for="CodigoUnico" class="control-label"></label>
+        <label asp-for="CodigoUnico" class="control-label">Codigo Único</label>
         <input asp-for="CodigoUnico" class="form-control" id="AdicionarEdificioModel2" />
     </div> 
     
     <div class="form-group mb-1">
-        <label asp-for="NumeroAptos" class="control-label"></label>
+        <label asp-for="NumeroAptos" class="control-label">Numero partições</label>
         <input asp-for="NumeroAptos" class="form-control" id="AdicionarEdificioModel4" />
     </div>
+
+    <div class="form-group mb-1">
+        <label asp-for="Responsavel_email" class="control-label">Escolha um responsavel:</label>
+        <div class="input-group">
+            <select asp-for="Responsavel_email" class="form-control" id="ResponsaveisAptosid">
+                <option value="">Escolha uma resposavel</option>
+            </select>
+            <button type="button" title="Editar" class="btn btn-secondary" id="redirecionar-btn">
+                <i class="bi bi-pencil-square"></i>
+            </button>
+        </div>        
+    </div>
+
 
 
     <button type="button" class="btn btn-outline-primary gap-1 d-flex align-items-center" onclick="AtualizaEdificio();">

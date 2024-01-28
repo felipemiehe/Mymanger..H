@@ -2,11 +2,13 @@
 @using Auth.Entities
 @{
 
-var CustomModal = new CustomModalModel
+    var CustomModal = new CustomModalModel
      {
                 Title = "Editar Edifícios",
                 Id = "testeedificio"
      };
+
+    var AddEdificiosModel = new AdicionarEdificioModel();
 
 }
 
@@ -57,8 +59,9 @@ var CustomModal = new CustomModalModel
 
             <!-- Coluna do Formulário -->
             <div class="col-md-3">
-                <div class="card p-3 shadow">    
-                    22
+                <div class="card p-3 shadow">  
+                    <h5 class="mb-4">Adicionar Edificios</h5>
+                    <partial name="_EdficioAdicionarPartial" model="AddEdificiosModel" />
                 </div>
             </div>
 
@@ -119,5 +122,50 @@ var CustomModal = new CustomModalModel
 
         filtrarEdificios()            
     }   
+
+    // função do adiiconar pegar opções de resposaveis
+    function carregarOpcoes() {
+        $.ajax({
+            url: '@Url.Action("GetResponsaveisPossiveis", "EdificiosAtivos")',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {                
+                $('#ResponsaveisAptosid').find('option').remove();
+
+                $('#ResponsaveisAptosid').append($('<option>', {
+                    value: '',
+                    disabled: true,
+                    selected: true,
+                    hidden: true,
+                    text: 'Selecionar Responsável'
+                }));
+
+                // Adicionar opções dinâmicas
+                $.each(data, function (index, item) {
+                    var option = $('<option>', {
+                        value: item.email,
+                        text: item.email
+                    });
+
+                    // Adicionar a opção ao select
+                    $('#ResponsaveisAptosid').append(option);
+                });
+
+                // Adicionar evento de clique para o redirecionamento
+                $('#redirecionar-btn').on('click', function () {
+                    var selectedEmail = $('#ResponsaveisAptosid').val();
+                    if (selectedEmail) {
+                        var url = '@Url.Action("Index", "UserxUser")?email=' + selectedEmail;
+                        window.location.href = url;
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Erro ao carregar opções:', error);
+            }
+        });
+    }
+
+    carregarOpcoes();
 
 </script>

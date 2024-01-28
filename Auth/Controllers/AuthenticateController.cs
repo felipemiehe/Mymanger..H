@@ -633,9 +633,8 @@ namespace Auth.Controllers
                 var userxUserAssociation = await _context.UserxUsers
                     .Where(uu => userIds.Contains(uu.User_Agregado_Id))
                     .Where(xx => xx.User_Admin_Id == userAdminId)
-                    .Select(xx => new UserAssociationResponsaveisResponseDTO{
-                        Email = xx.UserAgregado.Email,
-                        CodigoUnico = xx.UserAgregado.CodigoUnico
+                    .Select(xx => new EdificiosResponsaveisResponseDTO{
+                        Email = xx.UserAgregado.Email                        
                     })
                     .ToListAsync();
 

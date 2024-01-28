@@ -52,7 +52,7 @@ namespace front.Controllers
         public IActionResult GetEdificioList(int page = 1, int pageSize = 5, string? emailResponsavel = null, string? Endereco = null, string? nome = null, string? CodUnico = null)
         {
             List<EdifioxUserModel> edificioList = ObterListaEdificiosXUser(page, pageSize, emailResponsavel, Endereco, nome, CodUnico);
-            if (edificioList != null && edificioList.Count > 0 || emailResponsavel != null || Endereco != null || nome!= null || CodUnico != null)
+            if (edificioList != null && edificioList.Count > 0 || emailResponsavel != null || Endereco != null || nome != null || CodUnico != null)
             {
                 return PartialView("_EdificioxUserPartial", edificioList);
             }
@@ -116,13 +116,35 @@ namespace front.Controllers
                     List<string> errorMessages = JsonConvert.DeserializeObject<List<string>>(errorMessage);
                     foreach (var error in errorMessages)
                     {
-                        
+
                     }
                     return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_EdficioAtualizarPartial", model) });
                 }
             }
-            
+
             return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_EdficioAtualizarPartial", model) });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetResponsaveisPossiveis()
+        {
+            try
+            {             
+                HttpClient configuredClient = new ClienteComCookie(Request).ConfiguredClient;
+                HttpResponseMessage response = await configuredClient.GetAsync(configuredClient.BaseAddress + "api/auth/UserAptosResponsavaeis");
+               
+                response.EnsureSuccessStatusCode();
+                
+                string responseData = await response.Content.ReadAsStringAsync();
+                var responseDataObject = JsonConvert.DeserializeObject<List<PegarUserResponsaveisModel>>(responseData);
+
+                // Retorna os dados obtidos
+                return new JsonResult(responseDataObject);
+            }
+            catch (HttpRequestException ex)
+            {                
+                return BadRequest($"Erro ao obter os responsáveis: {ex.Message}");
+            }
         }
     }
 }
