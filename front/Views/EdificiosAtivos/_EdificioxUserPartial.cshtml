@@ -184,6 +184,29 @@ else
         });
     }
 
+    function AdicionarEdificio() {
+        var formData = $("#adicionarEdificioForm").serialize();
+        $.ajax({
+            url: '@Url.Action("adicionarEdificios", "EdificiosAtivos")',
+            type: 'POST',
+            data: formData,
+            success: function (result) {
+                if (result.success === false) {
+                    showErrorNotification("Erro ao Adicionar Edificio!");
+                    $('#adicionarEdificioForm').html(result.html);
+                    carregarOpcoes();
+                } else {
+                    showSuccessNotification("Criado o Edificio!");
+                    filtrarEdificios();
+                    $('#adicionarEdificioForm')[0].reset();
+                }
+            },
+            error: function (xhr, status, error) {
+                showErrorNotification('Erro na requisição');
+            }
+        });
+    }
+
 </script>
 
 

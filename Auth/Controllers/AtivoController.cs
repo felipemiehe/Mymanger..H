@@ -260,7 +260,9 @@ namespace Auth.Controllers
                         );
                 }
 
-                var userxAtivosRecords = await query.ToListAsync();
+                var userxAtivosRecords = await query
+                    .OrderByDescending(x => x.Data_criacao)
+                    .ToListAsync();
                 var totalRecords = userxAtivosRecords.Count();
 
                 var paginatedUsersxativos = userxAtivosRecords

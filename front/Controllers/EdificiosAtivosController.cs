@@ -116,7 +116,7 @@ namespace front.Controllers
                     List<string> errorMessages = JsonConvert.DeserializeObject<List<string>>(errorMessage);
                     foreach (var error in errorMessages)
                     {
-
+                        ModelState.AddModelError(string.Empty, error);
                     }
                     return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_EdficioAtualizarPartial", model) });
                 }
@@ -145,6 +145,41 @@ namespace front.Controllers
             {                
                 return BadRequest($"Erro ao obter os responsáveis: {ex.Message}");
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> adicionarEdificios(AdicionarEdificioModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                string data = JsonConvert.SerializeObject(model);
+                StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+
+                HttpClient configuredClient = new ClienteComCookie(Request).ConfiguredClient;
+
+                HttpResponseMessage response = await configuredClient.PostAsync(configuredClient.BaseAddress + "api/ativo/create", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string newEdificio = await response.Content.ReadAsStringAsync();
+                    AtualizaEdificiosModel userModel = JsonConvert.DeserializeObject<AtualizaEdificiosModel>(newEdificio);
+
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    string errorMessage = await response.Content.ReadAsStringAsync();
+
+                    List<string> errorMessages = JsonConvert.DeserializeObject<List<string>>(errorMessage);
+                    foreach (var error in errorMessages)
+                    {
+                        ModelState.AddModelError(string.Empty, error);
+                    }
+                    return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_EdficioAdicionarPartial", model) });
+                }
+            }
+
+            return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_EdficioAdicionarPartial", model) });
         }
     }
 }

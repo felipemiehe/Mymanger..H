@@ -21,6 +21,8 @@ namespace Auth.Entities
         // pode ser numero so de referencia como 50 unidades separadas dentro do edificio
         public int? NumeroAptos { get; set; }
 
+        public DateTime Data_criacao { get; set; } = DateTime.Now;
+
         [Required]        
         public List<ListResponsaveisAtivos> Responsaveis { get; set; } = new List<ListResponsaveisAtivos>();
 

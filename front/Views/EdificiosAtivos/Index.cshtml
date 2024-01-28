@@ -34,10 +34,14 @@
                             <label for="codigoUnico">Código Único</label>
                             <input type="text" class="form-control" id="codigoUnico12" placeholder="Digite o Código Único">
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="emailResponsavel">email do Responsavel</label>
-                            <input type="text" class="form-control" id="emailResponsavel12" placeholder="email do Responsavel">
-                        </div>                       
+                        <div class="col-md-3 mb-1">
+                            <label class="control-label">Responsáveis Disponivel:</label>
+                            <div class="input-group">
+                                <select class="form-control" id="emailResponsavelaptos">
+                                    <option value="">Escolha uma resposavel</option>
+                                </select>                                
+                            </div>
+                        </div>
                         <div class="mx-auto d-block text-center gap-2">
                             <button class="btn btn-primary" style="max-width:100px;" type="button" onclick="filtrarEdificios()">
                                 Filtrar
@@ -86,7 +90,7 @@
     function filtrarEdificios() {
             var page = new URLSearchParams(window.location.search).get('page') || 1;
             var Endereco = $("#Endereco12").val();
-            var emailResponsavel = $("#emailResponsavel12").val();
+            var emailResponsavel = $("#emailResponsavelaptos").val();
             var CodUnico = $("#codigoUnico12").val();
             var nome = $("#Nome12").val();
 
@@ -111,7 +115,7 @@
     }
 
     function limpaFiltroEdificios() {
-        $("#emailResponsavel12").val("");
+        $("#emailResponsavelaptos").val("");
         $("#Endereco12").val("");
         $("#codigoUnico12").val("");
         $("#Nome12").val("");
@@ -147,8 +151,12 @@
                         text: item.email
                     });
 
-                    // Adicionar a opção ao select
-                    $('#ResponsaveisAptosid').append(option);
+                    // Adicionar a opção ao select #ResponsaveisAptosid
+                    $('#ResponsaveisAptosid').append(option.clone());
+
+                    // Adicionar a opção ao select #emailResponsavelaptos
+                    $('#emailResponsavelaptos').append(option.clone());
+
                 });
 
                 // Adicionar evento de clique para o redirecionamento

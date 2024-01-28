@@ -10,12 +10,11 @@ namespace Auth.DTO
         [DataType(DataType.Text, ErrorMessage = "O campo deve ser um texto.")]
         public string Nome { get; set; }
 
+        [Required(ErrorMessage = "endereço obrigatório")]
         public string? Endereco { get; set; }
 
-        [Required(ErrorMessage = "CodigoUnico é obrigatório")]
-        public String CodigoUnico { get; set; }
-
-        public int? AtivoId { get; set;}
+        [Required(ErrorMessage = "Codigo Unico é obrigatório")]
+        public String CodigoUnico { get; set; }        
 
         public int? NumeroAptos { get;  set; }
 
