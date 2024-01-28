@@ -9,11 +9,7 @@
     int currentPageNumber = string.IsNullOrEmpty(currentPage) ? 1 : Convert.ToInt32(currentPage);
     int itemsPerPage = 5;
 
-    var CustomModal = new CustomModalModel
-     {
-                Title = "Editar Edifícios",
-                Id = "testeedificio"
-     };
+    
 }
 
 <!-- Coluna da Lista de Edificios -->
@@ -130,11 +126,11 @@ else
     </div>
 }
 
-<partial name="_CustomModal" model="CustomModal" />
+
 
 <script>
 
-    function refreshEdficiosList() {
+   @*  function refreshEdficiosList() {
         return new Promise(function (resolve, reject) {
             var page = new URLSearchParams(window.location.search).get('page') || 1;
             $.ajax({
@@ -151,7 +147,7 @@ else
                 }
             });
         });
-    }
+    } *@
 
     function deletaEdificio(id) {
         $.ajax({
@@ -162,13 +158,12 @@ else
                 if (result.success === false) {
                     showErrorNotification(result.message);
                 } else {
-                    refreshEdficiosList().then(function () {
-                        showSuccessNotification(result.message);
-                    });
+                    filtrarEdificios();
+                    showSuccessNotification(result.message);                   
                 }
             },
             error: function () {
-                showErrorNotification('Erro na requisição AJAX');
+                showErrorNotification('Erro na requisição');
             }
         });
     }
@@ -187,5 +182,30 @@ else
         });
     }
 
+    function AtualizaEdificio() {
+        var formData = $("#atualizarEdificioForm").serialize();
+        $.ajax({
+            url: '@Url.Action("atualizarEdificios", "EdificiosAtivos")',
+            type: 'POST',
+            data: formData,
+            success: function (result) {
+                if (result.success === false) {
+                    showErrorNotification("Erro ao atualizar Edificio!");
+                    $('#testeedificio').html(result.html);
+                } else {
+                    showSuccessNotification("Atualizado o Edificio!");
+                    filtrarEdificios();
+                }
+            },
+            error: function (xhr, status, error) {
+                showErrorNotification('Erro na requisição');
+            }
+        });
+    }
 
 </script>
+
+
+
+
+            

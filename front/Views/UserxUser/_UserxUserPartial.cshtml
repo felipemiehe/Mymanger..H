@@ -169,27 +169,7 @@ else
 
 
 
-<script>      
-   
-
-    function refreshUserList() {
-        return new Promise(function (resolve, reject) {
-            var page = new URLSearchParams(window.location.search).get('page') || 1;  
-            $.ajax({
-                url: '@Url.Action("GetUserList", "UserxUser")',
-                type: 'GET',
-                data: { page: page },
-                success: function (data) {
-                    $("#USERXUSER").html(data);
-                    resolve();  // Resolve a Promise quando a operação for concluída com sucesso
-                },
-                error: function (error) {
-                    showWarningNotification('Usuários não foram carregados corretamente');
-                    reject(error);  // Rejeita a Promise em caso de erro
-                }
-            });
-        });
-    }
+<script> 
 
     function obterDadosDoUsuario(userId) {
         $.ajax({
@@ -217,7 +197,7 @@ else
                     showErrorNotification("Erro ao atualizar usuário!");
                     $('.modal-body-edit-user').html(result.html);
                 } else {                   
-                    refreshUserList()
+                    filtrarUsuarios()
                         .then(function () {
 
                             showSuccessNotification('Usuário Atualizado com sucesso');
@@ -245,7 +225,7 @@ else
                     showErrorNotification("Erro ao deletar usuario!");                    
                 } else {
                     showSuccessNotification('Usuário deletado com sucesso');                    
-                    refreshUserList()
+                    filtrarUsuarios()
                 }
             },
             error: function () {

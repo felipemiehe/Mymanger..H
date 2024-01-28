@@ -4,6 +4,7 @@ using front.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace front.Controllers
 {
@@ -87,6 +88,41 @@ namespace front.Controllers
             AtualizaEdificiosModel userModel = JsonConvert.DeserializeObject<AtualizaEdificiosModel>(userJson);
 
             return PartialView("_EdficioAtualizarPartial", userModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> atualizarEdificios(AtualizaEdificiosModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                string data = JsonConvert.SerializeObject(model);
+                StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+
+                HttpClient configuredClient = new ClienteComCookie(Request).ConfiguredClient;
+
+                HttpResponseMessage response = await configuredClient.PutAsync(configuredClient.BaseAddress + "api/ativo/autualizaedificios", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string newEdificio = await response.Content.ReadAsStringAsync();
+                    AtualizaEdificiosModel userModel = JsonConvert.DeserializeObject<AtualizaEdificiosModel>(newEdificio);
+
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    string errorMessage = await response.Content.ReadAsStringAsync();
+
+                    List<string> errorMessages = JsonConvert.DeserializeObject<List<string>>(errorMessage);
+                    foreach (var error in errorMessages)
+                    {
+                        
+                    }
+                    return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_EdficioAtualizarPartial", model) });
+                }
+            }
+            
+            return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_EdficioAtualizarPartial", model) });
         }
     }
 }

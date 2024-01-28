@@ -111,7 +111,7 @@
                         showErrorNotification("Erro ao Associar função!");
                         $('.associarolesclass').html(result.html);
                     } else {
-                        refreshUserList()
+                        filtrarUsuarios()
                             .then(function () {
                                 showSuccessNotification('Usuário Atualizado com sucesso');
                                 // tem que remover o modal quando da um refresh list ele pega alguma referencia
@@ -141,7 +141,7 @@
                         showErrorNotification("Erro Remover função!");
                         $('.associarolesclass').html(result.html);
                     } else {
-                        refreshUserList()
+                        filtrarUsuarios()
                             .then(function () {
                                 showSuccessNotification('Função removodida');
                                 // tem que remover o modal quando da um refresh list ele pega alguma referencia
@@ -177,6 +177,11 @@
                 $("#codigoUnico").val("");
                 $("#nome").val("");
                 $("#roleSelect").val("");
+
+            // Atualizar a URL para remover os parâmetros de consulta
+            var urlSemParametros = window.location.href.split('?')[0];
+            history.pushState({}, document.title, urlSemParametros);
+
             filtrarUsuarios()
                 .then(function () {
                     // Tem que remover o modal quando dá um refresh list
@@ -190,9 +195,9 @@
         // Função para filtrar usuários
         function filtrarUsuarios() {
             return new Promise(function (resolve, reject) {
-                var page = 1;
+                var page = new URLSearchParams(window.location.search).get('page') || 1;
                 var cpf = $("#cpf").val();
-                var email = $("#email").val();
+                var email = new URLSearchParams(window.location.search).get('email') || $("#email").val();
                 var codigoUnico = $("#codigoUnico").val();
                 var nome = $("#nome").val();
                 var role = $("#roleSelect").val();

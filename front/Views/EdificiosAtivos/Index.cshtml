@@ -1,6 +1,14 @@
 ﻿@model List<front.Models.EdifioxUserModel>
 @using Auth.Entities
+@{
 
+var CustomModal = new CustomModalModel
+     {
+                Title = "Editar Edifícios",
+                Id = "testeedificio"
+     };
+
+}
 
 <div class="card-body pt-4 p-3 mb-3">
     <div class="p-3 shadow">
@@ -67,11 +75,13 @@
     </div>
 </div>
 
+<partial name="_CustomModal" model="CustomModal" />
+
 <script>
 
     // Função para filtrar Edificios
-    function filtrarEdificios() {        
-            var page = 1;
+    function filtrarEdificios() {
+            var page = new URLSearchParams(window.location.search).get('page') || 1;
             var Endereco = $("#Endereco12").val();
             var emailResponsavel = $("#emailResponsavel12").val();
             var CodUnico = $("#codigoUnico12").val();
@@ -102,7 +112,12 @@
         $("#Endereco12").val("");
         $("#codigoUnico12").val("");
         $("#Nome12").val("");
+
+        // Atualizar a URL para remover os parâmetros de consulta
+        var urlSemParametros = window.location.href.split('?')[0];
+        history.pushState({}, document.title, urlSemParametros);
+
         filtrarEdificios()            
-    }
+    }   
 
 </script>
