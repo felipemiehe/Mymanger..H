@@ -608,6 +608,46 @@ namespace Auth.Controllers
             }
         }
 
+        [HttpGet]
+        [Authorize(Roles = UserRoles.Admin)]
+        [Route("UserAptosResponsavaeis")]
+        public async Task<IActionResult> PegarUserxResponsaveis()
+        {
+            try
+            {
+                var userAdminId = User.FindFirstValue("userId");
+
+                // Pegar roleId com base no nome da role
+                var roleId = await _context.Roles
+                    .Where(r => r.Name == "fiscais") // alterar fiscais para funçoes depois
+                    .Select(r => r.Id)
+                    .FirstOrDefaultAsync();
+
+                // pegando ids do usuarios com roleID
+                var userIds = await _context.UserRoles
+                        .Where(ur => ur.RoleId == roleId)
+                        .Select(ur => ur.UserId)
+                        .ToListAsync();
+
+                // Pegar apenas usuarios com relaçao ao admin
+                var userxUserAssociation = await _context.UserxUsers
+                    .Where(uu => userIds.Contains(uu.User_Agregado_Id))
+                    .Where(xx => xx.User_Admin_Id == userAdminId)
+                    .Select(xx => new UserAssociationResponsaveisResponseDTO{
+                        Email = xx.UserAgregado.Email,
+                        CodigoUnico = xx.UserAgregado.CodigoUnico
+                    })
+                    .ToListAsync();
+
+                return Ok(userxUserAssociation);
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning("Erro ao UserAptosResponsavaeis");
+                return NotFound(new ResponseDTO { Status = "Error", Message = e.ToString() });
+            }
+        }
+
         [HttpPost]
         [Authorize(Roles = UserRoles.Admin)]
         [Route("associarole")]
