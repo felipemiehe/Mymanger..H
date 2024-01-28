@@ -52,7 +52,7 @@ namespace front.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet]        
         public IActionResult Index()
         {
 
@@ -98,7 +98,7 @@ namespace front.Controllers
                         var authProperties = new AuthenticationProperties
                         {
                             // Defina o tempo de expiração do cookie
-                            ExpiresUtc = DateTime.Now.AddMinutes(120),
+                            ExpiresUtc = DateTime.Now.AddMinutes(90),                            
                             IsPersistent = true, 
                             AllowRefresh = true 
                         };
@@ -107,7 +107,7 @@ namespace front.Controllers
 
                         HttpContext.Response.Cookies.Append("X-Access-Token", responseObject.token, new CookieOptions
                         {
-                            Expires = DateTime.Now.AddMinutes(120),
+                            Expires = DateTime.Now.AddMinutes(90),
                             HttpOnly = true,
                             Secure = true,
                             IsEssential = true,
