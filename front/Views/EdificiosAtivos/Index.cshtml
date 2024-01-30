@@ -84,7 +84,9 @@
 </div>
 
 <partial name="_CustomModal" model="CustomModal" />
+@section Scripts {
 
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 <script>
 
     // Função para filtrar Edificios
@@ -223,11 +225,35 @@
 
             }
         });
+    }   
+
+    function desssacociarResponsaveis() {
+        var formData = $("#EdificioAdicionarResponsavelForm").serialize();
+        $.ajax({
+            url: '@Url.Action("desssacociarResponsaveis", "EdificiosAtivos")',
+            type: 'POST',
+            data: formData,
+            success: function (result) {
+                if (result.success === false) {
+                    showErrorNotification("Erro ao remover responsavel!");
+                    $('#EdificioAdicionarResponsavelForm').html(result.html);
+                    carregarOpcoes();
+                } else {
+                    showSuccessNotification("Responsavel removido do Edificio!");
+                    filtrarEdificios();
+                    $('#EdificioAdicionarResponsavelForm')[0].reset();
+                }
+            },
+            error: function (xhr, status, error) {
+                showErrorNotification('Erro na requisição');
+
+            }
+        });
     }
 
 
 
 
 
-
 </script>
+}

@@ -213,5 +213,31 @@ namespace front.Controllers
 
             return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_EdificioAddResponsavelPartial", model) });
         }
+
+        [HttpPost("desssacociarResponsaveis")]
+        public async Task<IActionResult> desssacociarResponsaveis(EdificioAdicionarResponsavelModel model)
+        {
+
+            if (ModelState.IsValid)
+            {
+                string data = JsonConvert.SerializeObject(model);
+                StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+                HttpClient configuredClient = new ClienteComCookie(Request).ConfiguredClient;
+                HttpResponseMessage response = await configuredClient.PutAsync(configuredClient.BaseAddress + "api/ativo/desssacociarResponsaveis", content);
+
+                ResponseDTO Response = JsonConvert.DeserializeObject<ResponseDTO>(await response.Content.ReadAsStringAsync());
+                if (response.IsSuccessStatusCode)
+                {
+                    return Json(new { success = true, message = Response?.Message ?? "Sucesso Ao remover responsavel" });
+                }
+
+                ModelState.AddModelError(string.Empty, Response?.Message ?? "Erro inesperado!");
+
+                return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_EdificioAddResponsavelPartial", model) });
+            }
+
+            return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_EdificioAddResponsavelPartial", model) });
+
+        }
     }
 }
