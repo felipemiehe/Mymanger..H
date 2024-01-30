@@ -9,6 +9,7 @@
      };
 
     var AddEdificiosModel = new AdicionarEdificioModel();
+    var ResponsavelAddEdificio = new EdificioAdicionarResponsavelModel();
 
 }
 
@@ -72,10 +73,10 @@
             <!-- Coluna do Associa  -->
             <div class="col-md-3" id="stickytypeheader">
                 <div class="card p-3 shadow">
-                    3
+                    <h5 class="mb-4">Adicionar Responsáveis ao Edificio</h5>
+                    <partial name="_EdificioAddResponsavelPartial" model="ResponsavelAddEdificio" />
                 </div>
             </div>
-
 
 
         </div>
@@ -133,8 +134,11 @@
             url: '@Url.Action("GetResponsaveisPossiveis", "EdificiosAtivos")',
             type: 'GET',
             dataType: 'json',
-            success: function (data) {                
+            success: function (data) {  
+                
                 $('#ResponsaveisAptosid').find('option').remove();
+                $('#emailResponsavelaptos').find('option').remove();
+                $('#ResponsaveisAptosAddExtraid').find('option').remove();
 
                 $('#ResponsaveisAptosid').append($('<option>', {
                     value: '',
@@ -142,6 +146,21 @@
                     selected: true,
                     hidden: true,
                     text: 'Selecionar Responsável'                   
+                }));
+                $('#emailResponsavelaptos').append($('<option>', {
+                    value: '',
+                    disabled: true,
+                    selected: true,
+                    hidden: true,
+                    text: 'Selecionar Responsável'                   
+                }));
+
+                $('#ResponsaveisAptosAddExtraid').append($('<option>', {
+                    value: '',
+                    disabled: true,
+                    selected: true,
+                    hidden: true,
+                    text: 'Selecionar Responsável'
                 }));
 
                 // Adicionar opções dinâmicas
@@ -156,6 +175,9 @@
 
                     // Adicionar a opção ao select #emailResponsavelaptos
                     $('#emailResponsavelaptos').append(option.clone());
+                    
+                    // Adicionar a opção ao select #ResponsaveisAptosAddExtraid
+                    $('#ResponsaveisAptosAddExtraid').append(option.clone());
 
                 });
 
@@ -178,5 +200,34 @@
     }
 
     carregarOpcoes();
+
+    function adicionarResponsavelAoEdificio() {
+        var formData = $("#EdificioAdicionarResponsavelForm").serialize();
+        $.ajax({
+            url: '@Url.Action("adicionarResponsavelAoEdificio", "EdificiosAtivos")',
+            type: 'POST',
+            data: formData,
+            success: function (result) {
+                if (result.success === false) {
+                    showErrorNotification("Erro ao Adicionar responsavel!");
+                    $('#EdificioAdicionarResponsavelForm').html(result.html);  
+                    carregarOpcoes();
+                } else {
+                    showSuccessNotification("Responsavel atribuido ao Edificio!");
+                    filtrarEdificios();
+                    $('#EdificioAdicionarResponsavelForm')[0].reset();
+                }
+            },
+            error: function (xhr, status, error) {
+                showErrorNotification('Erro na requisição');
+
+            }
+        });
+    }
+
+
+
+
+
 
 </script>

@@ -1,4 +1,5 @@
-﻿using Auth.Entities;
+﻿using Auth.DTO;
+using Auth.Entities;
 using front.Helpers;
 using front.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -170,16 +171,47 @@ namespace front.Controllers
                 {
                     string errorMessage = await response.Content.ReadAsStringAsync();
 
-                    List<string> errorMessages = JsonConvert.DeserializeObject<List<string>>(errorMessage);
-                    foreach (var error in errorMessages)
-                    {
-                        ModelState.AddModelError(string.Empty, error);
-                    }
+                    ResponseDTO errorMessages = JsonConvert.DeserializeObject<ResponseDTO>(errorMessage);
+                    ModelState.AddModelError(string.Empty, errorMessages.Message);
                     return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_EdficioAdicionarPartial", model) });
                 }
             }
 
             return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_EdficioAdicionarPartial", model) });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> adicionarResponsavelAoEdificio(EdificioAdicionarResponsavelModel model)
+        {
+
+            ViewData["requestForm"] = "adicionarResponsavelAoEdificio";
+            if (ModelState.IsValid)
+            {
+                string data = JsonConvert.SerializeObject(model);
+                StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+
+                HttpClient configuredClient = new ClienteComCookie(Request).ConfiguredClient;
+
+                HttpResponseMessage response = await configuredClient.PostAsync(configuredClient.BaseAddress + "api/ativo/adicionarResponsavel", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string newEdificio = await response.Content.ReadAsStringAsync();
+                    AtualizaEdificiosModel userModel = JsonConvert.DeserializeObject<AtualizaEdificiosModel>(newEdificio);
+
+                    return Json(new { success = true });
+                }
+                else
+                {
+                    string errorMessage = await response.Content.ReadAsStringAsync();
+
+                    ResponseDTO errorMessages = JsonConvert.DeserializeObject<ResponseDTO>(errorMessage);
+                    ModelState.AddModelError(string.Empty, errorMessages.Message);
+                    return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_EdificioAddResponsavelPartial", model) });
+                }
+            }
+
+            return Json(new { success = false, html = Helper.RenderRazorViewToString(this, "_EdificioAddResponsavelPartial", model) });
         }
     }
 }

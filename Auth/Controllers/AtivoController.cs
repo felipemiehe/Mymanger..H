@@ -366,7 +366,7 @@ namespace Auth.Controllers
         [HttpPost]
         [Authorize(Roles = $"{UserRoles.Admin}")]
         [Route("adicionarResponsavel")]
-        public async Task<IActionResult> addResponsavelAoAtivo([FromBody] AddResponsavelAoativoDTO dto)
+        public async Task<IActionResult> addResponsavelAoAtivo([FromBody] AddResponsavelEdificioDTO dto)
         {
             try
             {
