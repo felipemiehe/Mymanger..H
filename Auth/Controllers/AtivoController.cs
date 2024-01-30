@@ -71,6 +71,7 @@ namespace Auth.Controllers
                             {
                                 email_responsavel_criado = dto.Responsavel_email,
                                 Ativo = ativo,
+                                email_logs_quem_fez = userId,
                                 ResponsavelEmail = responsavel
                             });
 
@@ -362,6 +363,94 @@ namespace Auth.Controllers
             }
         }
 
+        [HttpPost]
+        [Authorize(Roles = $"{UserRoles.Admin}")]
+        [Route("adicionarResponsavel")]
+        public async Task<IActionResult> addResponsavelAoAtivo([FromBody] AddResponsavelAoativoDTO dto)
+        {
+            try
+            {
+                var userAdminId = User.FindFirstValue("userId");
+
+                // Encontra o responsável pelo email
+                var responsavel = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Email == dto.emailResponsavel);
+
+                if (responsavel == null)
+                {
+                    return BadRequest(new ResponseDTO { Status = "Error", Message = "O responsável com o email especificado não foi encontrado." });
+                }
+
+                
+                var roleNames = new List<string> { UserRoles.Fiscais, UserRoles.Admin, UserRoles.Reporter };              
+                var roleIds = await _context.Roles
+                    .Where(role => roleNames.Contains(role.Name))
+                    .Select(role => role.Id)
+                    .ToListAsync();
+
+                if (!await _context.UserRoles.AnyAsync(ur => ur.UserId == responsavel.Id && roleIds.Contains(ur.RoleId)))
+                {
+                    // O usuário não possui nenhuma das roles
+                    return BadRequest(new ResponseDTO { Status = "Error", Message = $"O usuário com o {dto.emailResponsavel} não pode ser responsável." });
+                }
+
+
+                if (!await IsUserAuthorizedToAssociate(userAdminId, responsavel.Id))
+                {
+                    return BadRequest(new ResponseDTO { Status = "Error", Message = "Usuário não autorizado para associar o responsável ao ativo." });
+                }
+
+                Ativo ativo = await _context.Ativos.FirstOrDefaultAsync(a => a.CodigoUnico == dto.CodigoUnicoAtivo);
+
+                if (ativo == null)
+                {
+                    return BadRequest(new ResponseDTO { Status = "Error", Message = "Ativo não encontrado." });
+                }
+
+                
+                if (!await UserHasRelationWithAsset(userAdminId, ativo.Id))
+                {
+                    return BadRequest(new ResponseDTO { Status = "Error", Message = "Usuário não tem acesso para realizar modificações." });
+                }
+
+                
+                if (await UserHasRelationWithAsset(responsavel.Id, ativo.Id))
+                {
+                    return BadRequest(new ResponseDTO { Status = "Error", Message = $"{dto.emailResponsavel} já está vinculado ao ativo {ativo.Nome}." });
+                }
+
+               
+                var novoAtivoxUser = new AtivoxUser
+                {
+                    User_id = responsavel.Id,
+                    Ativo_id = ativo.Id,
+                    Ativo = ativo
+                };
+                
+                _context.AtivoxUsers.Add(novoAtivoxUser);
+
+                
+                
+                ativo.Responsaveis.Add(new ListResponsaveisAtivos
+                {
+                    email_responsavel_criado = dto.emailResponsavel,
+                    Ativo = ativo,
+                    email_logs_quem_fez = userAdminId,
+                    ResponsavelEmail = responsavel
+                });
+                
+                await _context.SaveChangesAsync();
+
+                return Ok(new ResponseDTO { Status = "Success", Message = "Responsável adicionado com sucesso ao ativo." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Erro ao inserir adicionarResponsavel: " + ex.Message);
+                return StatusCode(500, "Erro interno do servidor: " + ex.Message);
+            }
+        }
+
+
 
         private async Task<bool> CheckRelationAtivoxUsers(String idRequisição, int IdEdificio)
         {
@@ -391,6 +480,20 @@ namespace Auth.Controllers
             }
             _logger.LogWarning($"Erro ao {NomeController}");
             return StatusCode(500, new ResponseDTO { Status = "Error", Message = "Erro inesperado" });
+        }
+
+        // Esta função verifica se o usuário atual tem permissão para associar o usuario passado
+        private async Task<bool> IsUserAuthorizedToAssociate(string userId, string responsibleUserId)
+        {
+            return await _context.UserxUsers
+                .AnyAsync(u => u.User_Admin_Id == userId && u.User_Agregado_Id == responsibleUserId);
+        }
+
+        // verificar se ele ja esta enserido na tabela
+        private async Task<bool> UserHasRelationWithAsset(string userId, int assetId)
+        {
+            return await _context.AtivoxUsers
+                .AnyAsync(au => au.User_id == userId && au.Ativo_id == assetId);
         }
 
 

@@ -32,7 +32,7 @@ namespace front.Controllers
         }
 
 
-        [Authorize(Roles = UserRoles.Admin)]
+        [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.Fiscais}")]
         [HttpGet("EdificiosAtivos")]
         public IActionResult Index(int page = 1, int pageSize = 5, string? emailResponsavel = null, string? Endereco = null, string? nome = null, string? CodUnico = null)
         {

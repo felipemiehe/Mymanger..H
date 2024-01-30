@@ -38,7 +38,7 @@
                             <label class="control-label">Responsáveis Disponivel:</label>
                             <div class="input-group">
                                 <select class="form-control" id="emailResponsavelaptos">
-                                    <option value="">Escolha uma resposavel</option>
+                                    <option value="">Escolha um Responsável</option>
                                 </select>                                
                             </div>
                         </div>
@@ -49,7 +49,7 @@
                             </button>
                             <button class="btn btn-outline-danger " style="max-width:100px;" type="button" onclick="limpaFiltroEdificios()">
                                 Limpar
-                                <i class="bi bi-x-square"></i>
+                                <i class="bi bi-x-square"></i>                                
                             </button>
                         </div>
 
@@ -141,7 +141,7 @@
                     disabled: true,
                     selected: true,
                     hidden: true,
-                    text: 'Selecionar Responsável'
+                    text: 'Selecionar Responsável'                   
                 }));
 
                 // Adicionar opções dinâmicas
@@ -164,6 +164,9 @@
                     var selectedEmail = $('#ResponsaveisAptosid').val();
                     if (selectedEmail) {
                         var url = '@Url.Action("Index", "UserxUser")?email=' + selectedEmail;
+                        window.location.href = url;
+                    }else{
+                        var url = '@Url.Action("Index", "UserxUser")';
                         window.location.href = url;
                     }
                 });
