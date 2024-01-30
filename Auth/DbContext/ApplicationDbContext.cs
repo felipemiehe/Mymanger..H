@@ -17,6 +17,7 @@ namespace Auth.DbContext
             fotoUrls = Set<FotoUrl>();
             UserxUsers = Set<UserxUser>();
             UserAdminRolescontrols = Set<UserAdminRolescontrol>();
+            ListResponsaveisAtivos = Set<ListResponsaveisAtivos>();
         }
 
         public DbSet<Chamado> Chamados { get; set; }
@@ -26,6 +27,8 @@ namespace Auth.DbContext
         public DbSet<FotoUrl> fotoUrls { get; set; }
         public DbSet<UserxUser> UserxUsers { get; set; }
         public DbSet<UserAdminRolescontrol> UserAdminRolescontrols { get; set; }
+        public DbSet<ListResponsaveisAtivos> ListResponsaveisAtivos { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

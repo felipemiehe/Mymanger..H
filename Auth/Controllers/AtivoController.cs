@@ -450,6 +450,43 @@ namespace Auth.Controllers
             }
         }
 
+        [HttpPut]
+        [Authorize(Roles = UserRoles.Admin)]
+        [Route("desssacociarResponsaveis")]
+        public async Task<IActionResult> desssacociarRoles([FromBody] AddResponsavelEdificioDTO dto)
+        {
+            try
+            {
+                var ativo = await _context.Ativos
+                 .Include(a => a.Responsaveis)
+                .FirstOrDefaultAsync(a => a.CodigoUnico == dto.CodigoUnicoAtivo);
+
+                if (ativo != null){
+
+                    var responsavelToRemove = await _context.ListResponsaveisAtivos
+                        .FirstOrDefaultAsync(r => r.Ativo_id == ativo.Id && r.ResponsavelEmail.Email == dto.emailResponsavel);
+
+                    if (responsavelToRemove != null)
+                    {
+                        ativo.Responsaveis.Remove(responsavelToRemove);
+                        await _context.SaveChangesAsync();
+                        return Ok(new ResponseDTO { Status = "Success", Message = $"{dto.emailResponsavel} removido do {ativo.Nome}" });
+                    }
+                }
+                else
+                {
+                    return NotFound(new ResponseDTO { Status = "Error", Message = $"{dto.emailResponsavel} nao existe para o edificio {ativo.Nome}" });
+                }                
+
+                return NotFound(new ResponseDTO { Status = "Error", Message = $"{dto.emailResponsavel} não encontrado." });
+            }
+            catch (Exception)
+            {
+                _logger.LogWarning("desssacociarResponsaveis");
+                throw;
+            }
+        }
+
 
 
         private async Task<bool> CheckRelationAtivoxUsers(String idRequisição, int IdEdificio)
