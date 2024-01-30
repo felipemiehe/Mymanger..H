@@ -74,3 +74,20 @@ function copiarElemento(elemento) {
     showSuccessNotification('copiado!');
 }
 
+$(function () {
+    var lastScrollTop = 0;
+
+    $(window).scroll(function () {
+        var currentScrollTop = $(window).scrollTop();
+
+        if (currentScrollTop > lastScrollTop) {
+            // Rolando para baixo
+            $('#stickytypeheader').css({ position: 'fixed', top: '0px', right: '0px', 'z-index': 999 });
+        } else {
+            // Rolando para cima
+            $('#stickytypeheader').css({ position: 'static', top: '0px', right: 'auto' });
+        }
+
+        lastScrollTop = currentScrollTop;
+    });
+});
