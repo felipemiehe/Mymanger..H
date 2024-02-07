@@ -15,52 +15,55 @@
     <div class="offcanvas-body">
         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3" style="list-style-type: none;">            
             
-            <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
+            @* <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
                 <a class="nav-link active" aria-current="page" href="#" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'" onclick="logout()">Logout</a>
-            </li>    
+            </li>     *@
             
-            <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
+            @* <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
                 <a class="nav-link active" aria-current="page" href="#" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Home</a>
             </li>
             <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
                 <a class="nav-link" href="#" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Link</a>
-            </li>
+            </li> *@
+
             @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
             {
                 <!-- Mostrar o item apenas se o usuário tiver a função "Admin" -->
                 <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
-                    <a class="nav-link" href="/userxuser" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Gerenciar Usuários</a>
+                    <a class="nav-link" href="/userxuser" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Meus Usuários</a>
                 </li>
                 <!-- Mostrar o item apenas se o usuário tiver a função "Admin" -->
                 <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
-                    <a class="nav-link" href="/EdificiosAtivos" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Gerenciar Edifícios</a>
+                    <a class="nav-link" href="/EdificiosAtivos" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Meus Edifícios</a>
                 </li>
             }
 
-
+            @if (User?.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+            {
             <!-- Acordion com varios items dentro colapse -->
-            <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;" data-bs-toggle="collapse" data-bs-target="#components-collapse" aria-expanded="true" aria-current="true">
-                <div class="accordion-button-text nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#components-collapse" aria-expanded="true" aria-controls="flush-collapseOne">
-                    Accordion Item #1
+            <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;" data-bs-toggle="collapse" data-bs-target="#components-collapse" aria-expanded="false" aria-current="true">
+                <div class="accordion-button-text nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#components-collapse" aria-expanded="false" aria-controls="flush-collapseOne">
+                    Gerenciar
                     <span class="accordion-icon"></span>
                 </div>
             </li>
 
             <li>
-                <div class="collapse show" id="components-collapse">
+                <div class="collapse" id="components-collapse">
                     <ul class="navbar-nav justify-content-end flex-grow-1 pe-3" style="list-style-type: none;">
-                        <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
-                            <a class="nav-link active" aria-current="page" href="#" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Home</a>
-                        </li>
-
-                        <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
-                            <a class="nav-link active" aria-current="page" href="#" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Ativos</a>
-                        </li>
-                        
+                            <!-- Mostrar o item apenas se o usuário tiver a função "Admin" -->
+                            <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
+                                <a class="nav-link" href="/userxuser" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Gerenciar Usuários</a>
+                            </li>
+                            <!-- Mostrar o item apenas se o usuário tiver a função "Admin" -->
+                            <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
+                                <a class="nav-link" href="/EdificiosAtivos" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Gerenciar Edifícios</a>
+                            </li>
                     </ul>
                 </div>
             </li>
             <!-- fim -->
+            }
 
             <li class="nav-item nav-item-sidebar" style="transition: background-color 0.3s;">
                 <a class="nav-link" href="#" style="text-decoration: none; color: #000;" onmouseover="this.style.color='#007bff'" onmouseout="this.style.color='#000'">Link</a>
@@ -71,3 +74,25 @@
         </ul>        
     </div>
 </div>
+
+<script>
+    // Função para abrir/fechar o menu ao pressionar a tecla 'Escape'
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            toggleMenu();
+        }
+    });
+
+    // Função para abrir/fechar o menu
+    function toggleMenu() {
+        var offcanvasNavbar = document.getElementById('offcanvasNavbar');
+        if (offcanvasNavbar) {
+            var isMenuVisible = offcanvasNavbar.classList.contains('show');
+            if (isMenuVisible) {
+                offcanvasNavbar.classList.remove('show'); // Remove a classe 'show' para fechar o menu
+            } else {
+                offcanvasNavbar.classList.add('show'); // Adiciona a classe 'show' para abrir o menu
+            }
+        }
+    }
+</script>

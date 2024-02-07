@@ -50,7 +50,8 @@ html {
     .navbar-nav .nav-item-sidebar:hover {
         transform: scale(1.2);
         transform-origin: center center;
-    }
+        background-color: #f0f0f0;
+    }   
 
 .offcanvas-body {
     overflow-x: hidden;
