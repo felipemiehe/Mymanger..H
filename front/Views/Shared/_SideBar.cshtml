@@ -76,23 +76,16 @@
 </div>
 
 <script>
-    // Função para abrir/fechar o menu ao pressionar a tecla 'Escape'
     document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape') {
-            toggleMenu();
-        }
-    });
+        // Verifique se a tecla pressionada é a tecla desejada, por exemplo, 'm' para abrir o menu
+        if (event.key === 'm') {
+            var offcanvasElement = document.getElementById('offcanvasNavbar');
+            var offcanvas = new bootstrap.Offcanvas(offcanvasElement);
 
-    // Função para abrir/fechar o menu
-    function toggleMenu() {
-        var offcanvasNavbar = document.getElementById('offcanvasNavbar');
-        if (offcanvasNavbar) {
-            var isMenuVisible = offcanvasNavbar.classList.contains('show');
-            if (isMenuVisible) {
-                offcanvasNavbar.classList.remove('show'); // Remove a classe 'show' para fechar o menu
-            } else {
-                offcanvasNavbar.classList.add('show'); // Adiciona a classe 'show' para abrir o menu
+            // Verifique se o offcanvas está atualmente visível
+            if (!offcanvasElement.classList.contains('show')) { 
+                offcanvas.show();                          
             }
         }
-    }
+    });
 </script>
