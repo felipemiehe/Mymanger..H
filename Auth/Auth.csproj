@@ -23,7 +23,6 @@
   <ItemGroup>
     <Folder Include="Migrations\" />
     <Folder Include="Repositories\Abstratc\" />
-    <Folder Include="Repositories\Domain\" />
     <Folder Include="Repositories\Implementation\" />
   </ItemGroup>
 
