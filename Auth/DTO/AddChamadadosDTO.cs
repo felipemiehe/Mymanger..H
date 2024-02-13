@@ -12,8 +12,9 @@ namespace Auth.DTO
         [Required(ErrorMessage = "Codigo Unico do Edificio é obrigatório")]  
         public string Ativo_CodigoUnico { get; set; }
 
-        // Coleção de URLs de fotos        
-        public ICollection<string>? Foto_URLs { get; set; } = new List<string>();
+        // URLs de fotos path do PC
+        [Required(ErrorMessage = "imagem é obrigatória")]  
+        public string foto_url { get; set; }
 
 
     }

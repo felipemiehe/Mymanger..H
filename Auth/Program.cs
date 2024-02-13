@@ -8,6 +8,7 @@ using Auth.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Auth.Entities;
 using Microsoft.Extensions.Configuration;
+using Azure.Storage.Blobs;
 
 var builder = WebApplication.CreateBuilder(args);
 

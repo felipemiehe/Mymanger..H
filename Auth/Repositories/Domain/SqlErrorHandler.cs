@@ -1,18 +1,10 @@
 ﻿using Auth.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Logging;
 
 public class SqlErrorHandler
 {
-    private readonly ILogger _logger;
-
-    public SqlErrorHandler(ILogger logger)
-    {
-        _logger = logger;
-    }
-
-    public IActionResult HandleSqlException(Exception ex, string NomeController)
+    public IActionResult HandleSqlException(Exception ex)
     {
         if (ex.InnerException is SqlException sqlException && sqlException.Number == 2601)
         {
@@ -26,7 +18,6 @@ public class SqlErrorHandler
 
             return new BadRequestObjectResult(new ResponseDTO { Status = "Error", Message = $"O valor '{valorDuplicado}' já está em uso." });
         }
-        _logger.LogWarning($"Erro ao {NomeController}");
         return new StatusCodeResult(500);
     }
 }
