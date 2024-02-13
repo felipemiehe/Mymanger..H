@@ -4,9 +4,18 @@ using Microsoft.Data.SqlClient;
 
 public class SqlErrorHandler
 {
-    public IActionResult HandleSqlException(Exception ex)
+    private readonly Exception _exception;
+    private readonly string _nomeControler;
+
+    public SqlErrorHandler(Exception ex, string nomeController)
     {
-        if (ex.InnerException is SqlException sqlException && sqlException.Number == 2601)
+        _exception = ex;
+        _nomeControler = nomeController;
+    }
+
+    public IActionResult HandleSqlException()
+    {
+        if (_exception.InnerException is SqlException sqlException && sqlException.Number == 2601)
         {
             // Número 2601 é a exceção específica para violação de restrição única no SQL Server
             var errorMessage = sqlException.Message;
@@ -18,6 +27,6 @@ public class SqlErrorHandler
 
             return new BadRequestObjectResult(new ResponseDTO { Status = "Error", Message = $"O valor '{valorDuplicado}' já está em uso." });
         }
-        return new StatusCodeResult(500);
+        return new ObjectResult(new ResponseDTO { Status = "Error", Message = _nomeControler + _exception.Message }) { StatusCode = 500 };
     }
 }

@@ -78,7 +78,8 @@ namespace Auth.Controllers
             }
             catch (Exception ex)
             {
-                return HandleSqlException(ex);
+                SqlErrorHandler sqlErrorHandler = new SqlErrorHandler(ex, "AdicionarChamado");
+                return sqlErrorHandler.HandleSqlException();
                 throw;
             }
         }
